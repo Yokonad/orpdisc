@@ -130,6 +130,9 @@ func (s *Service) Start() error {
 
 	// Run initial poll immediately
 	s.poll()
+	if err := s.SendDigest(s.ctx); err != nil {
+		s.logger.Error("Error al enviar resumen: %v", err)
+	}
 
 	// Main polling loop
 	for {
@@ -139,6 +142,9 @@ func (s *Service) Start() error {
 			return nil
 		case <-ticker.C:
 			s.poll()
+			if err := s.SendDigest(s.ctx); err != nil {
+				s.logger.Error("Error al enviar resumen: %v", err)
+			}
 		case <-s.stopChan:
 			s.logger.Info("Señal de parada del servicio recibida")
 			return nil

@@ -5,31 +5,15 @@ After=network.target
 
 [Service]
 Type=simple
-User=monitor
-WorkingDirectory=/opt/monitor
+User=root
+WorkingDirectory=/home/yokonad/yndhome/yndthings/orpdic
 EnvironmentFile=/etc/openrouter-monitor.env
-
-# Path to the binary
-ExecStart=/opt/monitor/monitor
-
-# Restart policy
+ExecStart=/home/yokonad/yndhome/yndthings/orpdic/monitor
 Restart=always
 RestartSec=10
-
-# Hardening
-NoNewPrivileges=true
-ProtectSystem=strict
-ProtectHome=true
-ReadOnlyPaths=/etc
-
-# Logging
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=openrouter-monitor
-
-# Health check port (optional)
-# The service exposes :8080/health for health checks
-# This can be disabled by removing the port binding if not needed
 
 [Install]
 WantedBy=multi-user.target

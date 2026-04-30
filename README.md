@@ -40,21 +40,12 @@ docker run -d \
 ### Desde systemd (Recomendado para VPS)
 
 ```bash
-# Copiar binario
-sudo cp monitor /opt/monitor/
-
 # Copiar archivo de servicio
 sudo cp openrouter-monitor.service /etc/systemd/system/
 
 # Crear archivo de entorno
 sudo nano /etc/openrouter-monitor.env
 # Agregar: DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
-
-# Crear usuario
-sudo useradd -r -m -d /var/lib/monitor -s /bin/false monitor
-
-# Establecer permisos
-sudo chown -R monitor:monitor /var/lib/monitor
 
 # Recargar systemd e iniciar
 sudo systemctl daemon-reload

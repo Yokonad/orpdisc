@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/Yokonad/orpdisc/internal/models"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 // DB wraps the SQLite database connection
@@ -16,7 +16,7 @@ type DB struct {
 
 // New creates a new database connection
 func New(dbPath string) (*DB, error) {
-	db, err := sql.Open("sqlite3", dbPath+"?_journal_mode=WAL&_busy_timeout=5000")
+	db, err := sql.Open("sqlite", dbPath+"?_journal_mode=WAL&_busy_timeout=5000")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}

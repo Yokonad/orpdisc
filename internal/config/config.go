@@ -19,6 +19,7 @@ type Config struct {
 	MaxRetries           int           `env:"MAX_RETRIES" envDefault:"5"`
 	CircuitBreakerThreshold int        `env:"CIRCUIT_BREAKER_THRESHOLD" envDefault:"5"`
 	CircuitBreakerTimeout   time.Duration `env:"CIRCUIT_BREAKER_TIMEOUT_MINUTES" envDefault:"60m"`
+	HealthCheckPort         string        `env:"HEALTH_CHECK_PORT" envDefault:":9090"`
 }
 
 // Load reads configuration from environment variables

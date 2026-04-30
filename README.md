@@ -149,26 +149,6 @@ curl http://localhost:8080/health
 # - 503 Service Unavailable: "no saludable: <error>" cuando la base de datos está caída
 ```
 
-## Arquitectura
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│              Monitor de OpenRouter para Discord             │
-│                        (Servicio Go)                        │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐    ┌──────────────┐    ┌──────────────┐  │
-│  │   Poller    │───▶│   Processor  │───▶│   Notifier   │  │
-│  │  (Ticker)   │    │  (Change     │    │  (Discord)   │  │
-│  │             │    │   Detection) │    │              │  │
-│  └─────────────┘    └──────────────┘    └──────────────┘  │
-│         │                   │                    │           │
-│         ▼                   ▼                    ▼           │
-│  ┌────────────────────────────────────────────────────┐   │
-│  │                   SQLite Storage                    │   │
-│  └────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
-
 ## Notificaciones de Discord
 
 El monitor envía embeds enriquecidos a Discord:

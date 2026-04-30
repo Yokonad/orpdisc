@@ -5,7 +5,7 @@ go 1.26.2
 require (
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/mattn/go-sqlite3 v1.14.22
+	modernc.org/sqlite v1.50.0
 )
 
 require (
@@ -18,5 +18,4 @@ require (
 	modernc.org/libc v1.72.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-	modernc.org/sqlite v1.50.0 // indirect
 )

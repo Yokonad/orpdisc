@@ -99,7 +99,7 @@ CREATE INDEX idx_notifications_sent ON notifications(sent_at);
 **Given** the database is empty
 **When** the service polls OpenRouter API
 **Then** it stores all models in SQLite
-**And** sends Discord notification for "New models discovered: N models"
+**And** sends Discord notification for "Nuevos modelos detectados: N modelos"
 
 ### SC-2: Price Decrease
 **Given** model X costs $0.01/1K tokens
@@ -135,24 +135,24 @@ CREATE INDEX idx_notifications_sent ON notifications(sent_at);
 {
   "embeds": [
     {
-      "title": "OpenRouter Model Update",
-      "description": "3 changes detected",
+      "title": "Actualización de Modelos de OpenRouter",
+      "description": "3 cambios detectados",
       "color": 3447003,
       "timestamp": "2026-04-28T16:00:00.000Z",
       "fields": [
         {
-          "name": "⬆️ New Models",
+          "name": "⬆️ Nuevos Modelos",
           "value": "• google/gemini-2.5-pro\n• anthropic/claude-opus-4.7",
           "inline": false
         },
         {
-          "name": "💰 Price Changes",
+          "name": "💰 Cambios de Precios",
           "value": "• openai/gpt-5.4: $0.01 → $0.008",
           "inline": false
         }
       ],
       "footer": {
-        "text": "OpenRouter Monitor"
+        "text": "Monitor de OpenRouter"
       }
     }
   ]

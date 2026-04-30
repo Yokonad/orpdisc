@@ -120,7 +120,7 @@ func NewService(cfg *config.Config, db *database.DB, client *openrouter.Client, 
 
 // Start begins the service's polling loop
 func (s *Service) Start() error {
-	s.logger.Info("Starting OpenRouter Discord Monitor service")
+	s.logger.Info("Iniciando servicio de Monitor de OpenRouter para Discord")
 	s.logger.Info("Poll interval: %s", s.cfg.PollInterval)
 	s.logger.Info("Discord webhook: %s", s.cfg.RedactedWebhookURL())
 
@@ -135,12 +135,12 @@ func (s *Service) Start() error {
 	for {
 		select {
 		case <-s.ctx.Done():
-			s.logger.Info("Service context cancelled, stopping...")
+			s.logger.Info("Servicio contexto cancelado, deteniendo...")
 			return nil
 		case <-ticker.C:
 			s.poll()
 		case <-s.stopChan:
-			s.logger.Info("Service stop signal received")
+			s.logger.Info("Señal de parada del servicio recibida")
 			return nil
 		}
 	}
@@ -148,7 +148,7 @@ func (s *Service) Start() error {
 
 // poll performs a single poll cycle: fetch -> process -> notify
 func (s *Service) poll() {
-	s.logger.Debug("Starting poll cycle")
+	s.logger.Debug("Iniciando ciclo de consulta")
 
 	// Fetch models from OpenRouter
 	apiModels, err := s.client.FetchModels(s.ctx)
@@ -157,7 +157,7 @@ func (s *Service) poll() {
 		return
 	}
 
-	s.logger.Info("Fetched %d text models from OpenRouter", len(apiModels))
+	s.logger.Info("Obtenidos %d modelos de texto de OpenRouter", len(apiModels))
 
 	// Process models and detect changes
 	changeset, err := s.proc.ProcessModels(s.ctx, apiModels)
@@ -167,11 +167,11 @@ func (s *Service) poll() {
 	}
 
 	if !changeset.HasChanges() {
-		s.logger.Info("No changes detected in this poll cycle")
+		s.logger.Info("No se detectaron cambios en este ciclo de consulta")
 		return
 	}
 
-	s.logger.Info("Detected %d changes: %d new, %d updated, %d removed",
+	s.logger.Info("Detectados %d cambios: %d nuevos, %d actualizados, %d eliminados",
 		changeset.TotalChanges(),
 		len(changeset.NewModels),
 		len(changeset.UpdatedModels),
@@ -183,7 +183,7 @@ func (s *Service) poll() {
 		return
 	}
 
-	s.logger.Info("Discord notification sent successfully")
+	s.logger.Info("Notificación de Discord enviada exitosamente")
 }
 
 // Stop gracefully stops the service
@@ -196,7 +196,7 @@ func (s *Service) Stop() error {
 	s.stopped = true
 	s.stopMutex.Unlock()
 
-	s.logger.Info("Stopping service...")
+	s.logger.Info("Deteniendo servicio...")
 
 	// Cancel context to stop in-flight operations
 	s.cancel()
@@ -206,7 +206,7 @@ func (s *Service) Stop() error {
 		s.logger.Error("Failed to close database: %v", err)
 	}
 
-	s.logger.Info("Service stopped gracefully")
+	s.logger.Info("Servicio detenido exitosamente")
 	return nil
 }
 
@@ -255,11 +255,11 @@ func (s *Service) HealthCheckServer(addr string) *http.Server {
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		if err := s.HealthCheck(); err != nil {
 			w.WriteHeader(http.StatusServiceUnavailable)
-			fmt.Fprintf(w, "unhealthy: %v", err)
+			fmt.Fprintf(w, "no saludable: %v", err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "healthy")
+		fmt.Fprint(w, "saludable")
 	})
 
 	server := &http.Server{
@@ -294,7 +294,7 @@ func (s *Service) SendDigest(ctx context.Context) error {
 	}
 
 	// Log digest info
-	s.logger.Info("Sending digest: %d model by cost, %d by context/cost ratio",
+	s.logger.Info("Enviando resumen: %d modelo por costo, %d por ratio contexto/costo",
 		len(topByCost), len(topByRatio))
 
 	return s.webhook.SendNotification(ctx, changeset)

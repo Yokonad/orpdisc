@@ -1,24 +1,24 @@
 # orpdisc
 
-Automated service that polls OpenRouter API for model pricing/capabilities and sends Discord webhook notifications for the best model.
+Servicio automatizado que consulta la API de OpenRouter para obtener precios/capacidades de modelos y envía notificaciones de webhook de Discord para el mejor modelo.
 
-## Features
+## Características
 
-- **Automated Polling**: Polls OpenRouter API every 4 hours (configurable)
-- **Change Detection**: Hash-based detection for new models, price changes, and removed models
-- **Discord Notifications**: Rich embed notifications with dynamic colors
-- **Circuit Breaker**: Resilience pattern to prevent API exhaustion
-- **Health Checks**: Optional HTTP health check endpoint
+- **Consulta Automatizada**: Consulta la API de OpenRouter cada 4 horas (configurable)
+- **Detección de Cambios**: Detección basada en hash para nuevos modelos, cambios de precios y modelos eliminados
+- **Notificaciones de Discord**: Notificaciones enrichidas con colores dinámicos
+- **Circuit Breaker**: Patrón de resiliencia para prevenir agotamiento de la API
+- **Verificaciones de Salud**: Endpoint HTTP opcional para verificaciones de salud
 
-## Installation
+## Instalación
 
-### Prerequisites
+### Requisitos Previos
 
 - Go 1.21+
 - SQLite3
-- Discord webhook URL
+- URL de webhook de Discord
 
-### From Source
+### Desde el Código Fuente
 
 ```bash
 git clone https://github.com/Yokonad/orpdisc.git
@@ -26,7 +26,7 @@ cd orpdisc
 go build -o monitor ./cmd/monitor
 ```
 
-### From Docker
+### Desde Docker
 
 ```bash
 docker build -t openrouter-monitor .
@@ -37,49 +37,49 @@ docker run -d \
   openrouter-monitor
 ```
 
-### From systemd (Recommended for VPS)
+### Desde systemd (Recomendado para VPS)
 
 ```bash
-# Copy binary
+# Copiar binario
 sudo cp monitor /opt/monitor/
 
-# Copy service file
+# Copiar archivo de servicio
 sudo cp openrouter-monitor.service /etc/systemd/system/
 
-# Create environment file
+# Crear archivo de entorno
 sudo nano /etc/openrouter-monitor.env
-# Add: DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+# Agregar: DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 
-# Create user
+# Crear usuario
 sudo useradd -r -m -d /var/lib/monitor -s /bin/false monitor
 
-# Set permissions
+# Establecer permisos
 sudo chown -R monitor:monitor /var/lib/monitor
 
-# Reload systemd and start
+# Recargar systemd e iniciar
 sudo systemctl daemon-reload
 sudo systemctl enable openrouter-monitor
 sudo systemctl start openrouter-monitor
 ```
 
-## Configuration
+## Configuración
 
-The service is configured via environment variables:
+El servicio se configura mediante variables de entorno:
 
-| Variable | Default | Description |
+| Variable | Valor por defecto | Descripción |
 |----------|---------|-------------|
-| `DISCORD_WEBHOOK_URL` | **required** | Discord webhook URL |
-| `POLL_INTERVAL_MINUTES` | `240` | Minutes between polls |
-| `DB_PATH` | `./data.db` | SQLite database file path |
-| `LOG_LEVEL` | `info` | Log level: debug, info, warn, error |
-| `HTTP_TIMEOUT_SECONDS` | `30` | HTTP request timeout |
-| `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` | OpenRouter API base URL |
-| `MAX_RETRIES` | `5` | Maximum retry attempts for failed requests |
-| `CIRCUIT_BREAKER_THRESHOLD` | `5` | Number of consecutive failures before circuit opens |
-| `CIRCUIT_BREAKER_TIMEOUT_MINUTES` | `60` | Minutes to wait before retry after circuit opens |
-| `HEALTH_CHECK_PORT` | `:8080` | Port for health check HTTP server (empty to disable) |
+| `DISCORD_WEBHOOK_URL` | **requerido** | URL del webhook de Discord |
+| `POLL_INTERVAL_MINUTES` | `240` | Minutos entre consultas |
+| `DB_PATH` | `./data.db` | Ruta del archivo de base de datos SQLite |
+| `LOG_LEVEL` | `info` | Nivel de log: debug, info, warn, error |
+| `HTTP_TIMEOUT_SECONDS` | `30` | Tiempo de espera para solicitudes HTTP |
+| `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` | URL base de la API de OpenRouter |
+| `MAX_RETRIES` | `5` | Intentos máximos para solicitudes fallidas |
+| `CIRCUIT_BREAKER_THRESHOLD` | `5` | Número de fallos consecutivos antes de abrir el circuito |
+| `CIRCUIT_BREAKER_TIMEOUT_MINUTES` | `60` | Minutos de espera antes de reintentar después de abrir el circuito |
+| `HEALTH_CHECK_PORT` | `:8080` | Puerto para el servidor HTTP de verificación de salud (vacío para desactivar) |
 
-### Example Environment File
+### Ejemplo de Archivo de Entorno
 
 ```
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/1498708885681209364/R2dWL1LoGb3jINU0OuHWm-bgM6d_P4s39w0upvoUY3kOhy0elTv2ZcwNe4uHKqNJj8nd
@@ -91,16 +91,16 @@ CIRCUIT_BREAKER_TIMEOUT_MINUTES=60
 HEALTH_CHECK_PORT=:8080
 ```
 
-## Usage
+## Uso
 
-### Running from Command Line
+### Ejecutar desde Línea de Comando
 
 ```bash
-# With environment variables
+# Con variables de entorno
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/... ./monitor
 
-# With environment file
-./monitor  # reads from .env file if present
+# Con archivo de entorno
+./monitor  # lee desde archivo .env si existe
 ```
 
 ### Docker
@@ -117,44 +117,44 @@ docker run -d \
 ### systemd
 
 ```bash
-# Start the service
+# Iniciar el servicio
 sudo systemctl start openrouter-monitor
 
-# Check status
+# Verificar estado
 sudo systemctl status openrouter-monitor
 
-# View logs
+# Ver logs
 sudo journalctl -u openrouter-monitor -f
 
-# Stop the service
+# Detener el servicio
 sudo systemctl stop openrouter-monitor
 
-# Restart the service
+# Reiniciar el servicio
 sudo systemctl restart openrouter-monitor
 ```
 
-## Health Checks
+## Verificaciones de Salud
 
-The service optionally exposes an HTTP health check endpoint:
+El servicio expone opcionalmente un endpoint HTTP para verificaciones de salud:
 
 ```bash
-# Set HEALTH_CHECK_PORT to enable
+# Establecer HEALTH_CHECK_PORT para activar
 HEALTH_CHECK_PORT=:8080 ./monitor
 
-# Check health
+# Verificar salud
 curl http://localhost:8080/health
 
-# Response:
-# - 200 OK: "healthy" when database is reachable
-# - 503 Service Unavailable: "unhealthy: <error>" when database is down
+# Respuesta:
+# - 200 OK: "saludable" cuando la base de datos es accesible
+# - 503 Service Unavailable: "no saludable: <error>" cuando la base de datos está caída
 ```
 
-## Architecture
+## Arquitectura
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    OpenRouter Discord Monitor               │
-│                        (Go Service)                         │
+│              Monitor de OpenRouter para Discord             │
+│                        (Servicio Go)                        │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐    ┌──────────────┐    ┌──────────────┐  │
 │  │   Poller    │───▶│   Processor  │───▶│   Notifier   │  │
@@ -164,52 +164,52 @@ curl http://localhost:8080/health
 │         │                   │                    │           │
 │         ▼                   ▼                    ▼           │
 │  ┌────────────────────────────────────────────────────┐   │
-│  │                    SQLite Storage                   │   │
+│  │                   SQLite Storage                    │   │
 │  └────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Discord Notifications
+## Notificaciones de Discord
 
-The monitor sends rich embeds to Discord:
+El monitor envía embeds enriquecidos a Discord:
 
-- **🆕 New Models** (green): When new models appear on OpenRouter
-- **📝 Model Updates** (yellow): When pricing or context changes
-- **🗑️ Models No Longer Available** (red): When models are removed
+- **🆕 Nuevos Modelos** (verde): Cuando aparecen nuevos modelos en OpenRouter
+- **📝 Actualizaciones de Modelos** (amarillo): Cuando cambian precios o contexto
+- **🗑️ Modelos Ya No Disponibles** (rojo): Cuando se eliminan modelos
 
-## Troubleshooting
+## Solución de Problemas
 
-### Service won't start
+### El servicio no inicia
 
-1. Check that `DISCORD_WEBHOOK_URL` is set correctly
-2. Verify database path is writable
-3. Check logs: `journalctl -u openrouter-monitor -n 50`
+1. Verificar que `DISCORD_WEBHOOK_URL` esté configurado correctamente
+2. Verificar que la ruta de la base de datos tenga permisos de escritura
+3. Revisar logs: `journalctl -u openrouter-monitor -n 50`
 
-### No notifications being sent
+### No se envían notificaciones
 
-1. Verify webhook URL is valid
-2. Check that the Discord channel hasn't been deleted
-3. Review logs for API errors
-4. Ensure models have actually changed (first run populates DB without notifications)
+1. Verificar que la URL del webhook sea válida
+2. Verificar que el canal de Discord no haya sido eliminado
+3. Revisar logs en busca de errores de API
+4. Verificar que los modelos realmente hayan cambiado (la primera ejecución llena la DB sin notificaciones)
 
-### Circuit breaker keeps opening
+### El circuit breaker sigue abriéndose
 
-1. Check OpenRouter API status
-2. Increase `CIRCUIT_BREAKER_TIMEOUT_MINUTES`
-3. Increase `MAX_RETRIES` for temporary issues
+1. Verificar el estado de la API de OpenRouter
+2. Aumentar `CIRCUIT_BREAKER_TIMEOUT_MINUTES`
+3. Aumentar `MAX_RETRIES` para problemas temporales
 
-### Database locked errors
+### Errores de base de datos bloqueada
 
-1. Ensure only one instance is running
-2. Check disk space
-3. For high concurrency, consider switching to PostgreSQL
+1. Asegurarse de que solo una instancia esté ejecutándose
+2. Verificar espacio en disco
+3. Para alta concurrencia, considerar cambiar a PostgreSQL
 
-### Health check returns 503
+### La verificación de salud retorna 503
 
-1. Check database connectivity: `sqlite3 /path/to/data.db "SELECT 1;"`
-2. Verify disk space isn't full
-3. Check file permissions
+1. Verificar conectividad de la base de datos: `sqlite3 /path/to/data.db "SELECT 1;"`
+2. Verificar que el disco no esté lleno
+3. Verificar permisos de archivos
 
-## License
+## Licencia
 
 MIT

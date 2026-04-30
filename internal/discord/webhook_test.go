@@ -207,8 +207,8 @@ func TestBuildEmbedsForChangesetDigest(t *testing.T) {
 	if embeds[0].Color != ColorBlue {
 		t.Errorf("Digest embed color = %d, want %d (blue)", embeds[0].Color, ColorBlue)
 	}
-	if embeds[0].Title != "Daily Digest" {
-		t.Errorf("Digest embed title = %s, want Daily Digest", embeds[0].Title)
+	if embeds[0].Title != "Resumen Diario" {
+		t.Errorf("Digest embed title = %s, want Resumen Diario", embeds[0].Title)
 	}
 }
 

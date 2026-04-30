@@ -215,18 +215,18 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 
 		embed := DiscordEmbed{
-			Title:       "Daily Digest",
-			Description: "Top ranked models",
+			Title:       "Resumen Diario",
+			Description: "Modelos mejor rankeados",
 			Color:       ColorBlue,
 			Timestamp:   timestamp,
 			Fields: []DiscordField{
 				{
-					Name:   "Rankings",
+					Name:   "Clasificación",
 					Value:  joinLines(lines),
 					Inline: false,
 				},
 			},
-			Footer: &DiscordFooter{Text: "OpenRouter Monitor"},
+			Footer: &DiscordFooter{Text: "Monitor de OpenRouter"},
 		}
 		embeds = append(embeds, embed)
 		return embeds
@@ -240,18 +240,18 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 
 		embed := DiscordEmbed{
-			Title:       "New Models Discovered",
-			Description: fmt.Sprintf("%d new model(s) detected", len(changeset.NewModels)),
+			Title:       "Nuevos Modelos Descubiertos",
+			Description: fmt.Sprintf("%d nuevo(s) modelo(s) detectado(s)", len(changeset.NewModels)),
 			Color:       ColorGreen,
 			Timestamp:  timestamp,
 			Fields: []DiscordField{
 				{
-					Name:   "New Models",
+					Name:   "Nuevos Modelos",
 					Value:  joinLines(modelLines),
 					Inline: false,
 				},
 			},
-			Footer: &DiscordFooter{Text: "OpenRouter Monitor"},
+			Footer: &DiscordFooter{Text: "Monitor de OpenRouter"},
 		}
 		embeds = append(embeds, embed)
 	}
@@ -264,18 +264,18 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 
 		embed := DiscordEmbed{
-			Title:       "Model Updates",
-			Description: fmt.Sprintf("%d model(s) with updated pricing or context", len(changeset.UpdatedModels)),
+			Title:       "Actualizaciones de Modelos",
+			Description: fmt.Sprintf("%d modelo(s) con precio o contexto actualizado(s)", len(changeset.UpdatedModels)),
 			Color:       ColorYellow,
 			Timestamp:  timestamp,
 			Fields: []DiscordField{
 				{
-					Name:   "Price/Context Changes",
+					Name:   "Cambios de Precio/Contexto",
 					Value:  joinLines(modelLines),
 					Inline: false,
 				},
 			},
-			Footer: &DiscordFooter{Text: "OpenRouter Monitor"},
+			Footer: &DiscordFooter{Text: "Monitor de OpenRouter"},
 		}
 		embeds = append(embeds, embed)
 	}
@@ -288,18 +288,18 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 
 		embed := DiscordEmbed{
-			Title:       "Models No Longer Available",
-			Description: fmt.Sprintf("%d model(s) removed from OpenRouter", len(changeset.RemovedModels)),
+			Title:       "Modelos Ya No Disponibles",
+			Description: fmt.Sprintf("%d modelo(s) eliminado(s) de OpenRouter", len(changeset.RemovedModels)),
 			Color:       ColorRed,
 			Timestamp:  timestamp,
 			Fields: []DiscordField{
 				{
-					Name:   "Removed Models",
+					Name:   "Modelos Eliminados",
 					Value:  joinLines(modelLines),
 					Inline: false,
 				},
 			},
-			Footer: &DiscordFooter{Text: "OpenRouter Monitor"},
+			Footer: &DiscordFooter{Text: "Monitor de OpenRouter"},
 		}
 		embeds = append(embeds, embed)
 	}

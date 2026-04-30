@@ -89,8 +89,8 @@ func TestLoadDefaults(t *testing.T) {
 		t.Fatalf("Load() error = %v", err)
 	}
 
-	if cfg.PollInterval != 30*time.Minute {
-		t.Errorf("PollInterval = %v, want %v", cfg.PollInterval, 30*time.Minute)
+	if cfg.PollInterval != 4*time.Hour {
+		t.Errorf("PollInterval = %v, want %v", cfg.PollInterval, 4*time.Hour)
 	}
 
 	if cfg.DatabasePath != "./data.db" {

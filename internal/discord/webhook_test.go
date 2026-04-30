@@ -186,6 +186,79 @@ func TestBuildEmbedsForChangesetRemovedOnly(t *testing.T) {
 	}
 }
 
+func TestBuildEmbedsForChangesetDigest(t *testing.T) {
+	client := &WebhookClient{}
+
+	changeset := &models.Changeset{
+		NewModels: []models.Model{
+			{ID: "google/gemini", Name: "Gemini"},
+		},
+		UpdatedModels: []models.Model{
+			{ID: "anthropic/claude", Name: "Claude"},
+		},
+		IsDigest: true,
+	}
+
+	embeds := client.BuildEmbedsForChangeset(changeset)
+
+	if len(embeds) != 1 {
+		t.Errorf("BuildEmbedsForChangeset() (digest) returned %d embeds, want 1", len(embeds))
+	}
+	if embeds[0].Color != ColorBlue {
+		t.Errorf("Digest embed color = %d, want %d (blue)", embeds[0].Color, ColorBlue)
+	}
+	if embeds[0].Title != "Daily Digest" {
+		t.Errorf("Digest embed title = %s, want Daily Digest", embeds[0].Title)
+	}
+}
+
+func TestBuildEmbedsForChangesetNoEmojis(t *testing.T) {
+	client := &WebhookClient{}
+
+	changeset := &models.Changeset{
+		NewModels: []models.Model{
+			{ID: "google/gemini", Name: "Gemini"},
+		},
+		UpdatedModels: []models.Model{
+			{ID: "openai/gpt", Name: "GPT"},
+		},
+		RemovedModels: []models.Model{
+			{ID: "old/model", Name: "Old Model"},
+		},
+	}
+
+	embeds := client.BuildEmbedsForChangeset(changeset)
+
+	// Check that no embed contains emoji characters (U+1F000 to U+1FAFF and other emoji ranges)
+	emojiRanges := []struct {
+		start rune
+		end   rune
+	}{
+		{0x1F300, 0x1F9FF},  // Miscellaneous Symbols and Pictographs, Emoticons, Transport and Map Symbols, Activity and Game Icons
+		{0x2600, 0x26FF},    // Miscellaneous Symbols (some emoji-like)
+		{0x2700, 0x27BF},    // Dingbats (some emoji-like)
+	}
+
+	for i, embed := range embeds {
+		for j, field := range embed.Fields {
+			for _, r := range field.Name {
+				for _, rng := range emojiRanges {
+					if r >= rng.start && r <= rng.end {
+						t.Errorf("Embed %d field %d contains emoji character: U+%04X", i, j, r)
+					}
+				}
+			}
+			for _, r := range field.Value {
+				for _, rng := range emojiRanges {
+					if r >= rng.start && r <= rng.end {
+						t.Errorf("Embed %d field %d value contains emoji character: U+%04X", i, j, r)
+					}
+				}
+			}
+		}
+	}
+}
+
 func TestRateLimitError(t *testing.T) {
 	err := &RateLimitError{RetryAfter: 30 * time.Second}
 

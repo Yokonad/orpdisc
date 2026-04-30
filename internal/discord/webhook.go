@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"hash/fnv"
 	"io"
 	"net/http"
 	"net/url"
@@ -25,27 +24,25 @@ const (
 
 	// OpenRouterBaseURL is the base URL for model links
 	OpenRouterBaseURL = "https://openrouter.ai/models/"
-)
 
-var (
-	// NotificationColors is a list of distinct colors for embed rotation
-	NotificationColors = []int{
-		0x3498db, // Blue
-		0x9b59b6, // Purple
-		0xe91e63, // Pink
-		0x1abc9c, // Teal
-		0xf1c40f, // Yellow
-		0xe67e22, // Orange
-		0x2ecc71, // Green
-	}
+	// ColorGreen is used for new model notifications (#2ECC71)
+	ColorGreen = 3066993
+
+	// ColorYellow is used for price/context change notifications (#FFFF00)
+	ColorYellow = 16776960
+
+	// ColorRed is used for removed model notifications (#E74C3C)
+	ColorRed = 15158332
+
+	// ColorBlue is used for digest/ranking notifications (#3498DB)
+	ColorBlue = 3447003
 )
 
 // WebhookClient handles sending notifications to Discord webhooks
 type WebhookClient struct {
-	httpClient  *http.Client
-	webhookURL  string
-	maxRetries  int
-	colorIndex  int
+	httpClient *http.Client
+	webhookURL string
+	maxRetries int
 }
 
 // DiscordWebhookPayload represents the Discord webhook payload structure
@@ -93,15 +90,7 @@ func NewWebhookClient(webhookURL string, timeout time.Duration, maxRetries int) 
 		},
 		webhookURL: webhookURL,
 		maxRetries: maxRetries,
-		colorIndex: 0,
 	}, nil
-}
-
-// getNextColor returns the next color from the rotation
-func (c *WebhookClient) getNextColor() int {
-	color := NotificationColors[c.colorIndex]
-	c.colorIndex = (c.colorIndex + 1) % len(NotificationColors)
-	return color
 }
 
 // SendNotification sends a changeset as a Discord notification
@@ -215,6 +204,34 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 
 	timestamp := time.Now().UTC().Format(time.RFC3339)
 
+	// Handle digest separately - uses blue color and has special formatting
+	if changeset.IsDigest {
+		var lines []string
+		if len(changeset.NewModels) > 0 {
+			lines = append(lines, fmt.Sprintf("Best by Cost: [%s](%s%s)", changeset.NewModels[0].Name, OpenRouterBaseURL, changeset.NewModels[0].ID))
+		}
+		if len(changeset.UpdatedModels) > 0 {
+			lines = append(lines, fmt.Sprintf("Best by Context/Cost: [%s](%s%s)", changeset.UpdatedModels[0].Name, OpenRouterBaseURL, changeset.UpdatedModels[0].ID))
+		}
+
+		embed := DiscordEmbed{
+			Title:       "Daily Digest",
+			Description: "Top ranked models",
+			Color:       ColorBlue,
+			Timestamp:   timestamp,
+			Fields: []DiscordField{
+				{
+					Name:   "Rankings",
+					Value:  joinLines(lines),
+					Inline: false,
+				},
+			},
+			Footer: &DiscordFooter{Text: "OpenRouter Monitor"},
+		}
+		embeds = append(embeds, embed)
+		return embeds
+	}
+
 	// Build new models section
 	if len(changeset.NewModels) > 0 {
 		var modelLines []string
@@ -225,7 +242,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		embed := DiscordEmbed{
 			Title:       "New Models Discovered",
 			Description: fmt.Sprintf("%d new model(s) detected", len(changeset.NewModels)),
-			Color:       c.getNextColor(),
+			Color:       ColorGreen,
 			Timestamp:  timestamp,
 			Fields: []DiscordField{
 				{
@@ -249,7 +266,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		embed := DiscordEmbed{
 			Title:       "Model Updates",
 			Description: fmt.Sprintf("%d model(s) with updated pricing or context", len(changeset.UpdatedModels)),
-			Color:       c.getNextColor(),
+			Color:       ColorYellow,
 			Timestamp:  timestamp,
 			Fields: []DiscordField{
 				{
@@ -273,7 +290,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		embed := DiscordEmbed{
 			Title:       "Models No Longer Available",
 			Description: fmt.Sprintf("%d model(s) removed from OpenRouter", len(changeset.RemovedModels)),
-			Color:       getEmbedColor("Models No Longer Available"),
+			Color:       ColorRed,
 			Timestamp:  timestamp,
 			Fields: []DiscordField{
 				{
@@ -309,12 +326,4 @@ func joinLines(lines []string) string {
 		result += line + "\n"
 	}
 	return result
-}
-
-// getEmbedColor generates a deterministic color based on the seed string
-func getEmbedColor(seed string) int {
-	h := fnv.New32a()
-	h.Write([]byte(seed))
-	// Mask to 24-bit for Discord color
-	return int(h.Sum32() & 0xFFFFFF)
 }

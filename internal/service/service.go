@@ -288,7 +288,9 @@ func (s *Service) SendDigest(ctx context.Context) error {
 	topByRatio := processor.TopByContextCostRatio(allModels, 1)
 
 	changeset := &models.Changeset{
-		NewModels: topByCost, // Reusing field for digest content
+		NewModels:     topByCost,
+		UpdatedModels: topByRatio,
+		IsDigest:      true,
 	}
 
 	// Log digest info

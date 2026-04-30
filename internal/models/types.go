@@ -69,6 +69,7 @@ type Changeset struct {
 	NewModels     []Model `json:"new_models"`
 	UpdatedModels []Model `json:"updated_models"`
 	RemovedModels []Model `json:"removed_models"`
+	IsDigest      bool    `json:"is_digest"`
 }
 
 // HasChanges returns true if there are any changes in the changeset

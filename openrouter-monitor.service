@@ -1,0 +1,35 @@
+[Unit]
+Description=OpenRouter Discord Monitor
+Documentation=https://github.com/Yokonad/orpdisc
+After=network.target
+
+[Service]
+Type=simple
+User=monitor
+WorkingDirectory=/opt/monitor
+EnvironmentFile=/etc/openrouter-monitor.env
+
+# Path to the binary
+ExecStart=/opt/monitor/monitor
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/etc
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openrouter-monitor
+
+# Health check port (optional)
+# The service exposes :8080/health for health checks
+# This can be disabled by removing the port binding if not needed
+
+[Install]
+WantedBy=multi-user.target

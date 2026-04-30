@@ -1,0 +1,320 @@
+package discord
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"hash/fnv"
+	"io"
+	"net/http"
+	"net/url"
+	"strconv"
+	"time"
+
+	"github.com/cenkalti/backoff/v4"
+	"github.com/Yokonad/orpdisc/internal/models"
+)
+
+const (
+	// Discord API base URL
+	discordAPIURL = "https://discord.com/api/webhooks"
+
+	// MaxEmbedsPerRequest is the maximum number of embeds per webhook request
+	MaxEmbedsPerRequest = 10
+
+	// OpenRouterBaseURL is the base URL for model links
+	OpenRouterBaseURL = "https://openrouter.ai/models/"
+)
+
+var (
+	// NotificationColors is a list of distinct colors for embed rotation
+	NotificationColors = []int{
+		0x3498db, // Blue
+		0x9b59b6, // Purple
+		0xe91e63, // Pink
+		0x1abc9c, // Teal
+		0xf1c40f, // Yellow
+		0xe67e22, // Orange
+		0x2ecc71, // Green
+	}
+)
+
+// WebhookClient handles sending notifications to Discord webhooks
+type WebhookClient struct {
+	httpClient  *http.Client
+	webhookURL  string
+	maxRetries  int
+	colorIndex  int
+}
+
+// DiscordWebhookPayload represents the Discord webhook payload structure
+type DiscordWebhookPayload struct {
+	Embeds []DiscordEmbed `json:"embeds"`
+}
+
+// DiscordEmbed represents a Discord embed object
+type DiscordEmbed struct {
+	Title       string            `json:"title,omitempty"`
+	Description string            `json:"description,omitempty"`
+	Color       int               `json:"color,omitempty"`
+	Timestamp   string            `json:"timestamp,omitempty"`
+	Fields      []DiscordField    `json:"fields,omitempty"`
+	Footer      *DiscordFooter    `json:"footer,omitempty"`
+	URL         string            `json:"url,omitempty"`
+}
+
+// DiscordField represents a field in a Discord embed
+type DiscordField struct {
+	Name   string `json:"name,omitempty"`
+	Value  string `json:"value,omitempty"`
+	Inline bool   `json:"inline,omitempty"`
+}
+
+// DiscordFooter represents the footer of a Discord embed
+type DiscordFooter struct {
+	Text string `json:"text,omitempty"`
+}
+
+// NewWebhookClient creates a new Discord webhook client
+func NewWebhookClient(webhookURL string, timeout time.Duration, maxRetries int) (*WebhookClient, error) {
+	// Validate webhook URL is not empty
+	if webhookURL == "" {
+		return nil, fmt.Errorf("webhook URL cannot be empty")
+	}
+	// Validate webhook URL format
+	if _, err := url.Parse(webhookURL); err != nil {
+		return nil, fmt.Errorf("invalid webhook URL: %w", err)
+	}
+
+	return &WebhookClient{
+		httpClient: &http.Client{
+			Timeout: timeout,
+		},
+		webhookURL: webhookURL,
+		maxRetries: maxRetries,
+		colorIndex: 0,
+	}, nil
+}
+
+// getNextColor returns the next color from the rotation
+func (c *WebhookClient) getNextColor() int {
+	color := NotificationColors[c.colorIndex]
+	c.colorIndex = (c.colorIndex + 1) % len(NotificationColors)
+	return color
+}
+
+// SendNotification sends a changeset as a Discord notification
+// It batches embeds up to MaxEmbedsPerRequest per request
+func (c *WebhookClient) SendNotification(ctx context.Context, changeset *models.Changeset) error {
+	if changeset == nil || !changeset.HasChanges() {
+		return nil
+	}
+
+	// Build all embeds from the changeset
+	embeds := c.BuildEmbedsForChangeset(changeset)
+
+	if len(embeds) == 0 {
+		return nil
+	}
+
+	// Send in batches
+	for i := 0; i < len(embeds); i += MaxEmbedsPerRequest {
+		end := i + MaxEmbedsPerRequest
+		if end > len(embeds) {
+			end = len(embeds)
+		}
+
+		batch := embeds[i:end]
+		payload := DiscordWebhookPayload{Embeds: batch}
+
+		if err := c.sendWithRetry(ctx, payload); err != nil {
+			return fmt.Errorf("failed to send batch %d-%d: %w", i+1, end, err)
+		}
+	}
+
+	return nil
+}
+
+// sendWithRetry sends the payload with exponential backoff retry
+func (c *WebhookClient) sendWithRetry(ctx context.Context, payload DiscordWebhookPayload) error {
+	var lastErr error
+
+	operation := func() error {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
+		body, err := json.Marshal(payload)
+		if err != nil {
+			return err
+		}
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.webhookURL, bytes.NewReader(body))
+		if err != nil {
+			return err
+		}
+
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("User-Agent", "OpenRouter-Discord-Monitor/1.0")
+
+		resp, err := c.httpClient.Do(req)
+		if err != nil {
+			lastErr = fmt.Errorf("request failed: %w", err)
+			return err
+		}
+		defer resp.Body.Close()
+
+		// Handle rate limiting (429)
+		if resp.StatusCode == http.StatusTooManyRequests {
+			retryAfter := resp.Header.Get("Retry-After")
+			var retryDuration time.Duration
+
+			if retryAfter != "" {
+				if seconds, err := strconv.Atoi(retryAfter); err == nil {
+					retryDuration = time.Duration(seconds) * time.Second
+				}
+			}
+
+			if retryDuration == 0 {
+				retryDuration = 5 * time.Second // default fallback
+			}
+
+			lastErr = fmt.Errorf("rate limited by Discord, retry after: %s", retryDuration)
+			return &RateLimitError{RetryAfter: retryDuration}
+		}
+
+		if resp.StatusCode >= 400 {
+			respBody, _ := io.ReadAll(resp.Body)
+			lastErr = fmt.Errorf("Discord API error %d: %s", resp.StatusCode, string(respBody))
+			return fmt.Errorf("Discord returned status %d", resp.StatusCode)
+		}
+
+		return nil
+	}
+
+	backoffCfg := backoff.NewExponentialBackOff()
+	backoffCfg.InitialInterval = 1 * time.Second
+	backoffCfg.RandomizationFactor = 0.1
+	backoffCfg.Multiplier = 2.0
+	backoffCfg.MaxInterval = 30 * time.Second
+	backoffCfg.MaxElapsedTime = 2 * time.Minute
+
+	if err := backoff.Retry(operation, backoff.WithMaxRetries(backoffCfg, uint64(c.maxRetries))); err != nil {
+		return fmt.Errorf("failed after %d retries: %w", c.maxRetries, lastErr)
+	}
+
+	return nil
+}
+
+// BuildEmbedsForChangeset converts a Changeset into Discord embeds
+func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []DiscordEmbed {
+	var embeds []DiscordEmbed
+
+	timestamp := time.Now().UTC().Format(time.RFC3339)
+
+	// Build new models section
+	if len(changeset.NewModels) > 0 {
+		var modelLines []string
+		for _, m := range changeset.NewModels {
+			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s)", m.Name, OpenRouterBaseURL, m.ID))
+		}
+
+		embed := DiscordEmbed{
+			Title:       "New Models Discovered",
+			Description: fmt.Sprintf("%d new model(s) detected", len(changeset.NewModels)),
+			Color:       c.getNextColor(),
+			Timestamp:  timestamp,
+			Fields: []DiscordField{
+				{
+					Name:   "New Models",
+					Value:  joinLines(modelLines),
+					Inline: false,
+				},
+			},
+			Footer: &DiscordFooter{Text: "OpenRouter Monitor"},
+		}
+		embeds = append(embeds, embed)
+	}
+
+	// Build price/context changes section
+	if len(changeset.UpdatedModels) > 0 {
+		var modelLines []string
+		for _, m := range changeset.UpdatedModels {
+			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s)", m.Name, OpenRouterBaseURL, m.ID))
+		}
+
+		embed := DiscordEmbed{
+			Title:       "Model Updates",
+			Description: fmt.Sprintf("%d model(s) with updated pricing or context", len(changeset.UpdatedModels)),
+			Color:       c.getNextColor(),
+			Timestamp:  timestamp,
+			Fields: []DiscordField{
+				{
+					Name:   "Price/Context Changes",
+					Value:  joinLines(modelLines),
+					Inline: false,
+				},
+			},
+			Footer: &DiscordFooter{Text: "OpenRouter Monitor"},
+		}
+		embeds = append(embeds, embed)
+	}
+
+	// Build removed models section
+	if len(changeset.RemovedModels) > 0 {
+		var modelLines []string
+		for _, m := range changeset.RemovedModels {
+			modelLines = append(modelLines, fmt.Sprintf("• %s", m.Name))
+		}
+
+		embed := DiscordEmbed{
+			Title:       "Models No Longer Available",
+			Description: fmt.Sprintf("%d model(s) removed from OpenRouter", len(changeset.RemovedModels)),
+			Color:       getEmbedColor("Models No Longer Available"),
+			Timestamp:  timestamp,
+			Fields: []DiscordField{
+				{
+					Name:   "Removed Models",
+					Value:  joinLines(modelLines),
+					Inline: false,
+				},
+			},
+			Footer: &DiscordFooter{Text: "OpenRouter Monitor"},
+		}
+		embeds = append(embeds, embed)
+	}
+
+	return embeds
+}
+
+// RateLimitError represents a Discord rate limit error
+type RateLimitError struct {
+	RetryAfter time.Duration
+}
+
+func (e *RateLimitError) Error() string {
+	return fmt.Sprintf("rate limited, retry after: %s", e.RetryAfter)
+}
+
+// joinLines joins strings with newlines, limiting to avoid Discord embed limits
+func joinLines(lines []string) string {
+	result := ""
+	for i, line := range lines {
+		if i > 0 && i%10 == 0 {
+			result += "\n" // Add break every 10 lines to avoid embed limits
+		}
+		result += line + "\n"
+	}
+	return result
+}
+
+// getEmbedColor generates a deterministic color based on the seed string
+func getEmbedColor(seed string) int {
+	h := fnv.New32a()
+	h.Write([]byte(seed))
+	// Mask to 24-bit for Discord color
+	return int(h.Sum32() & 0xFFFFFF)
+}

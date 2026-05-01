@@ -151,7 +151,7 @@ func CalculateContextCostRatio(contextLength int, costPer1KTokens float64) float
 
 // FormatPriceChange formats a price change for display
 func FormatPriceChange(oldPrompt, oldCompletion, newPrompt, newCompletion float64) string {
-	return fmt.Sprintf("$%.6f → $%.6f per 1K tokens (prompt: $%.6f → $%.6f, completion: $%.6f → $%.6f)",
+	return fmt.Sprintf("$%.4f → $%.4f per 1M tokens (prompt: $%.6f → $%.6f, completion: $%.6f → $%.6f)",
 		(oldPrompt+oldCompletion)*1000, (newPrompt+newCompletion)*1000,
 		oldPrompt, newPrompt, oldCompletion, newCompletion)
 }
@@ -164,7 +164,7 @@ func GetModelDetails(model *models.Model) string {
 	var details []string
 	details = append(details, fmt.Sprintf("Provider: %s", model.Provider))
 	details = append(details, fmt.Sprintf("Context: %d tokens", model.ContextLength))
-	details = append(details, fmt.Sprintf("Cost: $%.6f per 1K tokens", costPer1K))
+	details = append(details, fmt.Sprintf("Cost: $%.4f per 1M tokens", costPer1K*1000))
 	details = append(details, fmt.Sprintf("Context/Cost Ratio: %.2f", ctxCostRatio))
 
 	if model.MaxCompletionTokens > 0 {

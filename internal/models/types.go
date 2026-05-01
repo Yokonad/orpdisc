@@ -27,6 +27,11 @@ func (m *Model) CostPer1KTokens() float64 {
 	return (m.PricingPrompt + m.PricingCompletion) * 1000
 }
 
+// CostPer1MTokens calculates the cost per 1M tokens
+func (m *Model) CostPer1MTokens() float64 {
+	return (m.PricingPrompt + m.PricingCompletion) * 1000000
+}
+
 // ContextCostRatio calculates the context length to cost ratio
 func (m *Model) ContextCostRatio() float64 {
 	cost := m.CostPer1KTokens()

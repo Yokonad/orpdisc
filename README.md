@@ -1,356 +1,108 @@
 <div align="center">
 
-<!-- ===== MAIN TITLE BANNER ===== -->
 <a href="https://github.com/Yokonad/orpdisc">
   <img src="https://img.shields.io/badge/ORPDISC-OpenRouter%20Discord%20Monitor-00E5FF?style=for-the-badge&logo=discord&logoColor=white&labelColor=0D1117&color=00E5FF" alt="ORPDISC" />
 </a>
 
-<br />
-<br />
+<br /><br />
 
-<!-- ===== ANIMATED GIF ===== -->
-<img src="https://media4.giphy.com/media/L1R1tvI9kwzkP8TgIr/giphy.gif" alt="Anime Tech Coding" width="720" style="border-radius: 12px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);" />
+<img src="https://media4.giphy.com/media/L1R1tvI9kwzkP8TgIr/giphy.gif" alt="Tech" width="640" style="border-radius: 8px;" />
 
-<br />
-<br />
+<br /><br />
 
-<!-- ===== TECH STACK BADGES ===== -->
-<img src="https://img.shields.io/badge/Cybersecurity%20Engineering-FF0000?style=for-the-badge&logo=security&logoColor=white&labelColor=0D1117&color=FF0000" />
-<img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white&labelColor=0D1117&color=3178C6" />
-<img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black&labelColor=0D1117&color=61DAFB" />
-<img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white&labelColor=0D1117&color=FF2D20" />
 <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white&labelColor=0D1117&color=00ADD8" />
 <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=0D1117&color=003B57" />
-<img src="https://img.shields.io/badge/Discord%20Webhook-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=0D1117&color=5865F2" />
-<img src="https://img.shields.io/badge/OpenRouter%20API-FF6B35?style=for-the-badge&logo=openai&logoColor=white&labelColor=0D1117&color=FF6B35" />
+<img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=0D1117&color=5865F2" />
+<img src="https://img.shields.io/badge/OpenRouter-FF6B35?style=for-the-badge&logo=openai&logoColor=white&labelColor=0D1117&color=FF6B35" />
 <img src="https://img.shields.io/badge/systemd-FFDD00?style=for-the-badge&logo=systemd&logoColor=black&labelColor=0D1117&color=FFDD00" />
 <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white&labelColor=0D1117&color=2496ED" />
-<img src="https://img.shields.io/badge/build-passing-00E676?style=for-the-badge&logo=githubactions&logoColor=white&labelColor=0D1117&color=00E676" />
 
 </div>
 
 <br />
-
-<!-- ================================================================================== -->
-<!-- SECTION: DESCRIPTION                                                               -->
-<!-- ================================================================================== -->
 
 <div align="left">
-  <img src="https://img.shields.io/badge/DESCRIPCION-FF00FF?style=for-the-badge&labelColor=0D1117&color=FF00FF" />
+  <img src="https://img.shields.io/badge/ACERCA%20DEL%20PROYECTO-00E5FF?style=for-the-badge&labelColor=0D1117&color=00E5FF" />
 </div>
 
-<b>orpdisc</b> es un servicio automatizado en <b>Go</b> que consulta la API de <b>OpenRouter</b>, detecta cambios en modelos de IA (nuevos, actualizados, eliminados) y envia notificaciones enriquecidas a <b>Discord</b> con precios exactos, ranking de calidad y horario inteligente.
+Servicio en Go que consulta la API de OpenRouter cada 30 min, detecta cambios en modelos de IA y envia notificaciones a Discord. Opera unicamente entre 9:00 y 19:00 (hora Peru) y muestra ranking de los mejores modelos por costo, relacion contexto/costo, capacidad y novedad.
 
 <br />
-
-<!-- ================================================================================== -->
-<!-- SECTION: FEATURES                                                                   -->
-<!-- ================================================================================== -->
-
-<div align="left">
-  <img src="https://img.shields.io/badge/CARACTERISTICAS-00E5FF?style=for-the-badge&labelColor=0D1117&color=00E5FF" />
-</div>
-
-<br />
-
-| Caracteristica | Descripcion |
-|:--|:--|
-| Monitor Automatico | Consulta la API de OpenRouter cada `30 min` y detecta cambios |
-| Ranking Inteligente | Top modelos por: costo, relacion contexto/costo, capacidad y novedad |
-| Horario Activo | Notificaciones solo entre **9:00 - 19:00** (hora Peru) |
-| Circuit Breaker | Previene saturacion de API con tolerancia a fallos configurable |
-| Health Check | Endpoint HTTP `:9090/health` para monitoreo |
-| SQLite | Almacenamiento local sin dependencias externas |
-| Auto-Restart | Systemd reinicia el servicio automaticamente si falla |
-| Docker | Despliegue en contenedor listo para produccion |
-
-<br />
-
-<!-- ================================================================================== -->
-<!-- SECTION: NOTIFICATIONS PREVIEW                                                      -->
-<!-- ================================================================================== -->
-
-<div align="left">
-  <img src="https://img.shields.io/badge/VISTA%20PREVIA%20DE%20NOTIFICACIONES-FF6B35?style=for-the-badge&labelColor=0D1117&color=FF6B35" />
-</div>
-
-<br />
-
-Cada 30 min (9am-7pm Peru) recibiras un resumen como este en Discord:
-
-```
-╔══════════════════════════════════════════════════════════╗
-║              RESUMEN DE MODELOS                          ║
-║           Mejores modelos del momento                    ║
-╠══════════════════╦═══════════════════════╦═══════════════╣
-║ Mejor por Costo  ║ Mejor Relacion        ║ Mas Capaz     ║
-║ [Gemini 2.5 Pro] ║ Contexto/Costo        ║ (Mayor Ctx)   ║
-║ $0.005/1K tokens ║ [Claude Opus]         ║ [Gemini 2.5]  ║
-║ 1M context       ║ $0.015/1K tokens      ║ $0.005/1K     ║
-║ Ratio: 200       ║ 200K context          ║ 1M context    ║
-╠══════════════════╩═══════════════════════╩═══════════════╣
-║  Modelo Mas Nuevo: [GPT-5] - visto 01/05/2026           ║
-╚══════════════════════════════════════════════════════════╝
-```
-
-<br />
-
-<!-- ================================================================================== -->
-<!-- SECTION: INSTALLATION                                                               -->
-<!-- ================================================================================== -->
 
 <div align="left">
   <img src="https://img.shields.io/badge/INSTALACION-00E676?style=for-the-badge&labelColor=0D1117&color=00E676" />
 </div>
 
-<br />
-
-### Requisitos Previos
-
-| Requisito | Version Minima |
-|:--|:--:|
-| [Go](https://go.dev/dl/) | `1.21+` |
-| [SQLite](https://www.sqlite.org/download.html) | `3.x` |
-| [Discord Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) | URL valida |
-
-<br />
-
-### Desde Codigo Fuente
-
 ```bash
-# Clonar repositorio
 git clone https://github.com/Yokonad/orpdisc.git
 cd orpdisc
-
-# Compilar binario
 go build -o monitor ./cmd/monitor
+```
 
-# Crear archivo de entorno
+```bash
 sudo tee /etc/openrouter-monitor.env << 'EOF'
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/tu-webhook-aqui
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/tu-webhook
 POLL_INTERVAL_MINUTES=30m
-DB_PATH=/home/usuario/orpdisc/data.db
-LOG_LEVEL=info
+DB_PATH=/var/lib/orpdisc/data.db
 HEALTH_CHECK_PORT=:9090
+ACTIVE_START_HOUR=9
+ACTIVE_END_HOUR=19
 EOF
 
-# Ejecutar
 ./monitor
 ```
 
-<br />
-
-### Desde Docker
+Para produccion con systemd:
 
 ```bash
-# Construir imagen
-docker build -t orpdisc .
-
-# Ejecutar contenedor
-docker run -d \
-  --name orpdisc \
-  --restart unless-stopped \
-  -e DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/... \
-  -e POLL_INTERVAL_MINUTES=30m \
-  -e ACTIVE_START_HOUR=9 \
-  -e ACTIVE_END_HOUR=19 \
-  -v /path/to/data:/data \
-  orpdisc
-```
-
-<br />
-
-### Desde systemd (Recomendado para VPS)
-
-```bash
-# 1. Copiar archivo de servicio
 sudo cp openrouter-monitor.service /etc/systemd/system/
-
-# 2. Crear archivo de entorno
-sudo nano /etc/openrouter-monitor.env
-
-# 3. Activar e iniciar servicio
 sudo systemctl daemon-reload
-sudo systemctl enable openrouter-monitor
-sudo systemctl start openrouter-monitor
-
-# 4. Verificar estado
-sudo systemctl status openrouter-monitor
+sudo systemctl enable --now openrouter-monitor
 ```
 
 <br />
-
-<!-- ================================================================================== -->
-<!-- SECTION: CONFIGURATION                                                              -->
-<!-- ================================================================================== -->
 
 <div align="left">
   <img src="https://img.shields.io/badge/CONFIGURACION-FFD700?style=for-the-badge&labelColor=0D1117&color=FFD700" />
 </div>
 
-<br />
-
-Todas las opciones se configuran mediante **variables de entorno** en `/etc/openrouter-monitor.env`:
-
 | Variable | Default | Descripcion |
 |:--|:--:|:--|
-| `DISCORD_WEBHOOK_URL` | **requerido** | URL del webhook de Discord |
-| `POLL_INTERVAL_MINUTES` | `30m` | Intervalo entre consultas a OpenRouter |
-| `DB_PATH` | `./data.db` | Ruta de la base de datos SQLite |
-| `LOG_LEVEL` | `info` | Nivel de log: `debug`, `info`, `warn`, `error` |
-| `HTTP_TIMEOUT_SECONDS` | `30s` | Timeout para requests HTTP |
+| `DISCORD_WEBHOOK_URL` | requerido | URL del webhook de Discord |
+| `POLL_INTERVAL_MINUTES` | `30m` | Intervalo entre consultas |
+| `DB_PATH` | `./data.db` | Ruta de la base de datos |
+| `LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
+| `HTTP_TIMEOUT_SECONDS` | `30s` | Timeout HTTP |
 | `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` | URL base de la API |
-| `MAX_RETRIES` | `5` | Intentos maximos antes de fallar |
-| `CIRCUIT_BREAKER_THRESHOLD` | `5` | Fallos consecutivos para abrir circuito |
-| `CIRCUIT_BREAKER_TIMEOUT_MINUTES` | `60m` | Tiempo de espera del circuit breaker |
-| `HEALTH_CHECK_PORT` | `:9090` | Puerto del health check HTTP |
-| `ACTIVE_START_HOUR` | `9` | Hora de inicio de notificaciones (Peru) |
-| `ACTIVE_END_HOUR` | `19` | Hora de fin de notificaciones (Peru) |
+| `MAX_RETRIES` | `5` | Reintentos maximos |
+| `CIRCUIT_BREAKER_THRESHOLD` | `5` | Fallos para abrir circuito |
+| `CIRCUIT_BREAKER_TIMEOUT_MINUTES` | `60m` | Espera del circuit breaker |
+| `HEALTH_CHECK_PORT` | `:9090` | Puerto health check |
+| `ACTIVE_START_HOUR` | `9` | Hora inicio notificaciones |
+| `ACTIVE_END_HOUR` | `19` | Hora fin notificaciones |
 
 <br />
-
-**Ejemplo completo de archivo de entorno:**
-
-```env
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/abc123/def456
-POLL_INTERVAL_MINUTES=30m
-DB_PATH=/var/lib/orpdisc/data.db
-LOG_LEVEL=info
-HTTP_TIMEOUT_SECONDS=30s
-MAX_RETRIES=5
-CIRCUIT_BREAKER_THRESHOLD=5
-CIRCUIT_BREAKER_TIMEOUT_MINUTES=60m
-HEALTH_CHECK_PORT=:9090
-ACTIVE_START_HOUR=9
-ACTIVE_END_HOUR=19
-```
-
-<br />
-
-<!-- ================================================================================== -->
-<!-- SECTION: USAGE                                                                      -->
-<!-- ================================================================================== -->
 
 <div align="left">
   <img src="https://img.shields.io/badge/USO-FF00FF?style=for-the-badge&labelColor=0D1117&color=FF00FF" />
 </div>
 
-<br />
-
-### Comandos Basicos
-
 ```bash
-# Iniciar servicio
-sudo systemctl start openrouter-monitor
-
-# Ver estado
-sudo systemctl status openrouter-monitor
-
-# Ver logs en tiempo real
+sudo systemctl start|stop|restart openrouter-monitor
 sudo journalctl -u openrouter-monitor -f
-
-# Detener
-sudo systemctl stop openrouter-monitor
-
-# Reiniciar
-sudo systemctl restart openrouter-monitor
+curl http://localhost:9090/health   # 200 = saludable
 ```
 
 <br />
-
-### Health Check
-
-```bash
-# Verificar que el servicio responde
-curl http://localhost:9090/health
-
-# Respuesta esperada:
-#   200 - "saludable"      (todo bien)
-#   503 - "no saludable"   (base de datos caida)
-```
-
-<br />
-
-<!-- ================================================================================== -->
-<!-- SECTION: TROUBLESHOOTING                                                            -->
-<!-- ================================================================================== -->
-
-<div align="left">
-  <img src="https://img.shields.io/badge/SOLUCION%20DE%20PROBLEMAS-FF4444?style=for-the-badge&labelColor=0D1117&color=FF4444" />
-</div>
-
-<br />
-
-| Problema | Solucion |
-|:--|:--|
-| El servicio no inicia | Verificar `DISCORD_WEBHOOK_URL`, permisos de DB y logs con `journalctl -u openrouter-monitor -n 50` |
-| No llegan notificaciones | Verificar webhook URL, canal de Discord, y horario activo (9:00-19:00 Peru) |
-| Circuit breaker abierto | Revisar estado de OpenRouter API, aumentar `CIRCUIT_BREAKER_TIMEOUT_MINUTES` |
-| Base de datos bloqueada | Solo una instancia a la vez, verificar espacio en disco |
-| Health check 503 | `sqlite3 /path/data.db "SELECT 1;"` -- verificar permisos y disco |
-| Notificaciones fuera de horario | Ajustar `ACTIVE_START_HOUR` y `ACTIVE_END_HOUR` en el archivo de entorno |
-
-<br />
-
-<!-- ================================================================================== -->
-<!-- SECTION: ORGANIZACION DEL PROYECTO                                                  -->
-<!-- ================================================================================== -->
-
-<div align="left">
-  <img src="https://img.shields.io/badge/ORGANIZACION%20DEL%20PROYECTO-00E5FF?style=for-the-badge&labelColor=0D1117&color=00E5FF" />
-</div>
-
-<br />
-
-```
-cmd/
-  monitor/
-    main.go                # Punto de entrada del servicio
-
-internal/
-  config/
-    config.go              # Configuracion por variables de entorno
-  database/
-    db.go                  # Capa de persistencia SQLite (modernc, CGO-free)
-  discord/
-    webhook.go             # Cliente de webhook Discord con retry
-  models/
-    types.go               # Tipos de datos: Model, Changeset, API response
-  openrouter/
-    client.go              # Cliente HTTP para OpenRouter API con circuit breaker
-  processor/
-    processor.go           # Deteccion de cambios y rankings de modelos
-  service/
-    service.go             # Orquestrador: polling, digest, health check
-
-openrouter-monitor.service   # Unidad systemd para produccion
-Dockerfile                   # Imagen Docker multi-stage
-```
-
-<br />
-
-<!-- ================================================================================== -->
-<!-- SECTION: LICENSE                                                                    -->
-<!-- ================================================================================== -->
 
 <div align="left">
   <img src="https://img.shields.io/badge/LICENCIA-00E676?style=for-the-badge&labelColor=0D1117&color=00E676" />
 </div>
 
-<br />
-
-Distribuido bajo licencia **MIT**. Consulta el archivo <a href="https://github.com/Yokonad/orpdisc/blob/main/LICENSE"><code>LICENSE</code></a> para mas detalles.
+MIT. Ver [LICENSE](https://github.com/Yokonad/orpdisc/blob/main/LICENSE).
 
 <br />
-
-<!-- ================================================================================== -->
-<!-- FOOTER                                                                              -->
-<!-- ================================================================================== -->
 
 <div align="center">
-  <hr style="border: 1px solid #00E5FF; width: 80%; opacity: 0.3;" />
-
-  <br />
-
   <sub>_Built with Go, SQLite & Discord Webhooks_</sub>
 </div>

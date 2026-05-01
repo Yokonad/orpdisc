@@ -202,33 +202,68 @@ func (c *WebhookClient) sendWithRetry(ctx context.Context, payload DiscordWebhoo
 func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []DiscordEmbed {
 	var embeds []DiscordEmbed
 
-	timestamp := time.Now().UTC().Format(time.RFC3339)
+	timestamp := time.Now().Format(time.RFC3339)
 
 	// Handle digest separately - uses blue color and has special formatting
 	if changeset.IsDigest {
-		var lines []string
+		var fields []DiscordField
+
 		if len(changeset.NewModels) > 0 {
 			m := changeset.NewModels[0]
-			lines = append(lines, fmt.Sprintf("Best by Cost: [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
+			cost := m.CostPer1KTokens()
+			value := fmt.Sprintf("[%s](%s%s)\n$%.6f/1K tokens\n%d context\nRatio: %.2f",
+				m.Name, OpenRouterBaseURL, m.ID, cost, m.ContextLength, m.ContextCostRatio())
+			fields = append(fields, DiscordField{
+				Name:   "Mejor por Costo",
+				Value:  value,
+				Inline: true,
+			})
 		}
+
 		if len(changeset.UpdatedModels) > 0 {
 			m := changeset.UpdatedModels[0]
-			lines = append(lines, fmt.Sprintf("Best by Context/Cost: [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
+			cost := m.CostPer1KTokens()
+			value := fmt.Sprintf("[%s](%s%s)\n$%.6f/1K tokens\n%d context\nRatio: %.2f",
+				m.Name, OpenRouterBaseURL, m.ID, cost, m.ContextLength, m.ContextCostRatio())
+			fields = append(fields, DiscordField{
+				Name:   "Mejor Relacion Contexto/Costo",
+				Value:  value,
+				Inline: true,
+			})
+		}
+
+		if len(changeset.RemovedModels) > 0 {
+			m := changeset.RemovedModels[0]
+			cost := m.CostPer1KTokens()
+			value := fmt.Sprintf("[%s](%s%s)\n$%.6f/1K tokens\n%d context\nMax salida: %d",
+				m.Name, OpenRouterBaseURL, m.ID, cost, m.ContextLength, m.MaxCompletionTokens)
+			fields = append(fields, DiscordField{
+				Name:   "Mas Capaz (Mayor Contexto)",
+				Value:  value,
+				Inline: true,
+			})
+		}
+
+		if len(changeset.DigestNewest) > 0 {
+			m := changeset.DigestNewest[0]
+			cost := m.CostPer1KTokens()
+			value := fmt.Sprintf("[%s](%s%s)\n$%.6f/1K tokens\n%d context\nVisto: %s",
+				m.Name, OpenRouterBaseURL, m.ID, cost, m.ContextLength,
+				m.FirstSeen.Format("02/01/2006"))
+			fields = append(fields, DiscordField{
+				Name:   "Modelo Mas Nuevo",
+				Value:  value,
+				Inline: true,
+			})
 		}
 
 		embed := DiscordEmbed{
-			Title:       "Resumen Diario",
-			Description: "Modelos mejor rankeados",
+			Title:       "Resumen de Modelos",
+			Description: "Mejores modelos del momento",
 			Color:       ColorBlue,
 			Timestamp:   timestamp,
-			Fields: []DiscordField{
-				{
-					Name:   "Clasificación",
-					Value:  joinLines(lines),
-					Inline: false,
-				},
-			},
-			Footer: &DiscordFooter{Text: "Monitor de OpenRouter"},
+			Fields:      fields,
+			Footer:      &DiscordFooter{Text: "Monitor de OpenRouter"},
 		}
 		embeds = append(embeds, embed)
 		return embeds

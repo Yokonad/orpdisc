@@ -130,9 +130,7 @@ func (s *Service) Start() error {
 
 	// Run initial poll immediately
 	s.poll()
-	if err := s.SendDigest(s.ctx); err != nil {
-		s.logger.Error("Error al enviar resumen: %v", err)
-	}
+	s.maybeSendDigest()
 
 	// Main polling loop
 	for {
@@ -142,13 +140,36 @@ func (s *Service) Start() error {
 			return nil
 		case <-ticker.C:
 			s.poll()
-			if err := s.SendDigest(s.ctx); err != nil {
-				s.logger.Error("Error al enviar resumen: %v", err)
-			}
+			s.maybeSendDigest()
 		case <-s.stopChan:
 			s.logger.Info("Señal de parada del servicio recibida")
 			return nil
 		}
+	}
+}
+
+// isWithinActiveHours checks if current Peru time is within the configured active window
+func (s *Service) isWithinActiveHours() bool {
+	loc, err := time.LoadLocation("America/Lima")
+	if err != nil {
+		s.logger.Warn("No se pudo cargar zona horaria America/Lima, usando UTC: %v", err)
+		loc = time.UTC
+	}
+	now := time.Now().In(loc)
+	hour := now.Hour()
+	return hour >= s.cfg.ActiveStartHour && hour < s.cfg.ActiveEndHour
+}
+
+// maybeSendDigest sends a digest only if within active hours
+func (s *Service) maybeSendDigest() {
+	if !s.isWithinActiveHours() {
+		loc, _ := time.LoadLocation("America/Lima")
+		s.logger.Debug("Fuera de horario activo (actual: %s), saltando resumen",
+			time.Now().In(loc).Format("15:04"))
+		return
+	}
+	if err := s.SendDigest(s.ctx); err != nil {
+		s.logger.Error("Error al enviar resumen: %v", err)
 	}
 }
 
@@ -276,7 +297,7 @@ func (s *Service) HealthCheckServer(addr string) *http.Server {
 	return server
 }
 
-// SendDigest sends a daily digest with top models
+// SendDigest sends a digest with top ranked models
 func (s *Service) SendDigest(ctx context.Context) error {
 	allModels, err := s.db.GetAllModels()
 	if err != nil {
@@ -284,6 +305,7 @@ func (s *Service) SendDigest(ctx context.Context) error {
 	}
 
 	if len(allModels) == 0 {
+		s.logger.Debug("Sin modelos en DB, saltando resumen")
 		return nil
 	}
 
@@ -293,15 +315,32 @@ func (s *Service) SendDigest(ctx context.Context) error {
 	// Get top 1 by context/cost ratio
 	topByRatio := processor.TopByContextCostRatio(allModels, 1)
 
+	// Get top 1 by largest context
+	topByContext := processor.TopByContextLength(allModels, 1)
+
+	// Get top 1 by newest
+	topByNewest := processor.TopByNewest(allModels, 1)
+
 	changeset := &models.Changeset{
-		NewModels:     topByCost,
-		UpdatedModels: topByRatio,
-		IsDigest:      true,
+		NewModels:      topByCost,      // Slot 1: Best by cost
+		UpdatedModels:  topByRatio,     // Slot 2: Best by context/cost ratio
+		RemovedModels:  topByContext,   // Slot 3: Most capable (largest context)
+		DigestNewest:   topByNewest,    // Slot 4: Newest model
+		IsDigest:       true,
 	}
 
 	// Log digest info
-	s.logger.Info("Enviando resumen: %d modelo por costo, %d por ratio contexto/costo",
-		len(topByCost), len(topByRatio))
+	s.logger.Info("Enviando resumen: costo=%s, ratio=%s, contexto=%s, nuevo=%s",
+		safeModelName(topByCost), safeModelName(topByRatio),
+		safeModelName(topByContext), safeModelName(topByNewest))
 
 	return s.webhook.SendNotification(ctx, changeset)
+}
+
+// safeModelName returns the name of the first model or "ninguno"
+func safeModelName(models []models.Model) string {
+	if len(models) == 0 {
+		return "ninguno"
+	}
+	return models[0].Name
 }

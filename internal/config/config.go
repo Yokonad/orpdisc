@@ -20,6 +20,8 @@ type Config struct {
 	CircuitBreakerThreshold int        `env:"CIRCUIT_BREAKER_THRESHOLD" envDefault:"5"`
 	CircuitBreakerTimeout   time.Duration `env:"CIRCUIT_BREAKER_TIMEOUT_MINUTES" envDefault:"60m"`
 	HealthCheckPort         string        `env:"HEALTH_CHECK_PORT" envDefault:":9090"`
+	ActiveStartHour        int           `env:"ACTIVE_START_HOUR" envDefault:"9"`
+	ActiveEndHour          int           `env:"ACTIVE_END_HOUR" envDefault:"19"`
 }
 
 // Load reads configuration from environment variables

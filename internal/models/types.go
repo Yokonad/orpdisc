@@ -66,10 +66,11 @@ const (
 
 // Changeset represents detected changes between two model snapshots
 type Changeset struct {
-	NewModels     []Model `json:"new_models"`
-	UpdatedModels []Model `json:"updated_models"`
-	RemovedModels []Model `json:"removed_models"`
-	IsDigest      bool    `json:"is_digest"`
+	NewModels      []Model `json:"new_models"`
+	UpdatedModels  []Model `json:"updated_models"`
+	RemovedModels  []Model `json:"removed_models"`
+	DigestNewest   []Model `json:"digest_newest,omitempty"`  // Newest models (digest only)
+	IsDigest       bool    `json:"is_digest"`
 }
 
 // HasChanges returns true if there are any changes in the changeset

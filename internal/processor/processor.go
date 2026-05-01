@@ -177,6 +177,36 @@ func GetModelDetails(model *models.Model) string {
 	return strings.Join(details, " | ")
 }
 
+// TopByContextLength returns the top N models sorted by largest context length
+func TopByContextLength(modelList []models.Model, n int) []models.Model {
+	sorted := make([]models.Model, len(modelList))
+	copy(sorted, modelList)
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].ContextLength > sorted[j].ContextLength
+	})
+
+	if n > len(sorted) {
+		n = len(sorted)
+	}
+	return sorted[:n]
+}
+
+// TopByNewest returns the top N models sorted by newest first_seen
+func TopByNewest(modelList []models.Model, n int) []models.Model {
+	sorted := make([]models.Model, len(modelList))
+	copy(sorted, modelList)
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].FirstSeen.After(sorted[j].FirstSeen)
+	})
+
+	if n > len(sorted) {
+		n = len(sorted)
+	}
+	return sorted[:n]
+}
+
 // TopByCostPer1K returns the top N models sorted by lowest cost per 1K tokens
 func TopByCostPer1K(modelList []models.Model, n int) []models.Model {
 	sorted := make([]models.Model, len(modelList))

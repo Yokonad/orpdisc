@@ -272,8 +272,17 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 	// Build new models section
 	if len(changeset.NewModels) > 0 {
 		var modelLines []string
-		for _, m := range changeset.NewModels {
+		maxDisplay := 10
+		displayCount := len(changeset.NewModels)
+		if displayCount > maxDisplay {
+			displayCount = maxDisplay
+		}
+		for i := 0; i < displayCount; i++ {
+			m := changeset.NewModels[i]
 			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
+		}
+		if len(changeset.NewModels) > maxDisplay {
+			modelLines = append(modelLines, fmt.Sprintf("... y %d modelos mas", len(changeset.NewModels)-maxDisplay))
 		}
 
 		embed := DiscordEmbed{
@@ -296,8 +305,17 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 	// Build price/context changes section
 	if len(changeset.UpdatedModels) > 0 {
 		var modelLines []string
-		for _, m := range changeset.UpdatedModels {
+		maxDisplay := 10
+		displayCount := len(changeset.UpdatedModels)
+		if displayCount > maxDisplay {
+			displayCount = maxDisplay
+		}
+		for i := 0; i < displayCount; i++ {
+			m := changeset.UpdatedModels[i]
 			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
+		}
+		if len(changeset.UpdatedModels) > maxDisplay {
+			modelLines = append(modelLines, fmt.Sprintf("... y %d modelos mas", len(changeset.UpdatedModels)-maxDisplay))
 		}
 
 		embed := DiscordEmbed{
@@ -320,8 +338,17 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 	// Build removed models section
 	if len(changeset.RemovedModels) > 0 {
 		var modelLines []string
-		for _, m := range changeset.RemovedModels {
+		maxDisplay := 10
+		displayCount := len(changeset.RemovedModels)
+		if displayCount > maxDisplay {
+			displayCount = maxDisplay
+		}
+		for i := 0; i < displayCount; i++ {
+			m := changeset.RemovedModels[i]
 			modelLines = append(modelLines, fmt.Sprintf("• %s — $%.6f/1K tokens, %d context", m.Name, m.CostPer1KTokens(), m.ContextLength))
+		}
+		if len(changeset.RemovedModels) > maxDisplay {
+			modelLines = append(modelLines, fmt.Sprintf("... y %d modelos mas", len(changeset.RemovedModels)-maxDisplay))
 		}
 
 		embed := DiscordEmbed{

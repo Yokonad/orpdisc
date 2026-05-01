@@ -128,15 +128,7 @@ func (c *Client) FetchModels(ctx context.Context) ([]models.APIModel, error) {
 	// Success - reset circuit breaker
 	c.recordSuccess()
 
-	// Filter for text models only
-	textModels := make([]models.APIModel, 0, len(apiResp.Models))
-	for _, m := range apiResp.Models {
-		if m.IsTextModel() {
-			textModels = append(textModels, m)
-		}
-	}
-
-	return textModels, nil
+	return apiResp.Models, nil
 }
 
 // isCircuitOpen checks if the circuit breaker is currently open

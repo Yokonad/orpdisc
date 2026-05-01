@@ -184,7 +184,7 @@ func (s *Service) poll() {
 		return
 	}
 
-	s.logger.Info("Obtenidos %d modelos de texto de OpenRouter", len(apiModels))
+	s.logger.Info("Obtenidos %d modelos de OpenRouter", len(apiModels))
 
 	// Process models and detect changes
 	changeset, err := s.proc.ProcessModels(s.ctx, apiModels)
@@ -334,7 +334,13 @@ func (s *Service) SendDigest(ctx context.Context) error {
 		safeModelName(topByCost), safeModelName(topByRatio),
 		safeModelName(topByContext), safeModelName(topByNewest))
 
-	return s.webhook.SendNotification(ctx, changeset)
+	if err := s.webhook.SendNotification(ctx, changeset); err != nil {
+		s.logger.Error("Error al enviar resumen a Discord: %v", err)
+		return err
+	}
+
+	s.logger.Info("Resumen enviado exitosamente a Discord")
+	return nil
 }
 
 // safeModelName returns the name of the first model or "ninguno"

@@ -22,6 +22,7 @@ type Config struct {
 	HealthCheckPort         string        `env:"HEALTH_CHECK_PORT" envDefault:":9090"`
 	ActiveStartHour        int           `env:"ACTIVE_START_HOUR" envDefault:"9"`
 	ActiveEndHour          int           `env:"ACTIVE_END_HOUR" envDefault:"19"`
+	USDtoPENRate           float64       `env:"USD_TO_PEN_RATE" envDefault:"3.52"`
 }
 
 // Load reads configuration from environment variables

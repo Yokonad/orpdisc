@@ -41,9 +41,10 @@ const (
 
 // WebhookClient handles sending notifications to Discord webhooks
 type WebhookClient struct {
-	httpClient *http.Client
-	webhookURL string
-	maxRetries int
+	httpClient  *http.Client
+	webhookURL  string
+	maxRetries  int
+	usdToPENRate float64
 }
 
 // DiscordWebhookPayload represents the Discord webhook payload structure
@@ -75,7 +76,7 @@ type DiscordFooter struct {
 }
 
 // NewWebhookClient creates a new Discord webhook client
-func NewWebhookClient(webhookURL string, timeout time.Duration, maxRetries int) (*WebhookClient, error) {
+func NewWebhookClient(webhookURL string, timeout time.Duration, maxRetries int, usdToPENRate ...float64) (*WebhookClient, error) {
 	// Validate webhook URL is not empty
 	if webhookURL == "" {
 		return nil, fmt.Errorf("webhook URL cannot be empty")
@@ -85,12 +86,18 @@ func NewWebhookClient(webhookURL string, timeout time.Duration, maxRetries int) 
 		return nil, fmt.Errorf("invalid webhook URL: %w", err)
 	}
 
+	rate := 3.52 // default
+	if len(usdToPENRate) > 0 && usdToPENRate[0] > 0 {
+		rate = usdToPENRate[0]
+	}
+
 	return &WebhookClient{
 		httpClient: &http.Client{
 			Timeout: timeout,
 		},
-		webhookURL: webhookURL,
-		maxRetries: maxRetries,
+		webhookURL:   webhookURL,
+		maxRetries:   maxRetries,
+		usdToPENRate: rate,
 	}, nil
 }
 
@@ -211,9 +218,8 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 
 		if len(changeset.NewModels) > 0 {
 			m := changeset.NewModels[0]
-			cost := m.CostPer1MTokens()
-			value := fmt.Sprintf("%s\n$%.4f/1M tokens\n%d context\nRatio: %.2f",
-				modelLine(m.Name, m.ID), cost, m.ContextLength, m.ContextCostRatio())
+			value := fmt.Sprintf("%s\n%s\n%d context\nRatio: %.2f",
+				modelLine(m.Name, m.ID), c.formatCost(m.CostPer1MTokens()), m.ContextLength, m.ContextCostRatio())
 			fields = append(fields, DiscordField{
 				Name:   "Mejor por Costo",
 				Value:  value,
@@ -223,9 +229,8 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 
 		if len(changeset.UpdatedModels) > 0 {
 			m := changeset.UpdatedModels[0]
-			cost := m.CostPer1MTokens()
-			value := fmt.Sprintf("%s\n$%.4f/1M tokens\n%d context\nRatio: %.2f",
-				modelLine(m.Name, m.ID), cost, m.ContextLength, m.ContextCostRatio())
+			value := fmt.Sprintf("%s\n%s\n%d context\nRatio: %.2f",
+				modelLine(m.Name, m.ID), c.formatCost(m.CostPer1MTokens()), m.ContextLength, m.ContextCostRatio())
 			fields = append(fields, DiscordField{
 				Name:   "Mejor Relacion Contexto/Costo",
 				Value:  value,
@@ -235,9 +240,8 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 
 		if len(changeset.RemovedModels) > 0 {
 			m := changeset.RemovedModels[0]
-			cost := m.CostPer1MTokens()
-			value := fmt.Sprintf("%s\n$%.4f/1M tokens\n%d context\nMax salida: %d",
-				modelLine(m.Name, m.ID), cost, m.ContextLength, m.MaxCompletionTokens)
+			value := fmt.Sprintf("%s\n%s\n%d context\nMax salida: %d",
+				modelLine(m.Name, m.ID), c.formatCost(m.CostPer1MTokens()), m.ContextLength, m.MaxCompletionTokens)
 			fields = append(fields, DiscordField{
 				Name:   "Mas Capaz (Mayor Contexto)",
 				Value:  value,
@@ -247,9 +251,8 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 
 		if len(changeset.DigestNewest) > 0 {
 			m := changeset.DigestNewest[0]
-			cost := m.CostPer1MTokens()
-			value := fmt.Sprintf("%s\n$%.4f/1M tokens\n%d context\nVisto: %s",
-				modelLine(m.Name, m.ID), cost, m.ContextLength,
+			value := fmt.Sprintf("%s\n%s\n%d context\nVisto: %s",
+				modelLine(m.Name, m.ID), c.formatCost(m.CostPer1MTokens()), m.ContextLength,
 				m.FirstSeen.Format("02/01/2006"))
 			fields = append(fields, DiscordField{
 				Name:   "Modelo Mas Nuevo",
@@ -280,7 +283,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 		for i := 0; i < displayCount; i++ {
 			m := changeset.NewModels[i]
-			modelLines = append(modelLines, fmt.Sprintf("• %s — $%.4f/1M tokens, %d context", modelLine(m.Name, m.ID), m.CostPer1MTokens(), m.ContextLength))
+			modelLines = append(modelLines, fmt.Sprintf("• %s — %s, %d context", modelLine(m.Name, m.ID), c.formatCost(m.CostPer1MTokens()), m.ContextLength))
 		}
 		if len(changeset.NewModels) > maxDisplay {
 			modelLines = append(modelLines, fmt.Sprintf("... y %d modelos mas", len(changeset.NewModels)-maxDisplay))
@@ -313,7 +316,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 		for i := 0; i < displayCount; i++ {
 			m := changeset.UpdatedModels[i]
-			modelLines = append(modelLines, fmt.Sprintf("• %s — $%.4f/1M tokens, %d context", modelLine(m.Name, m.ID), m.CostPer1MTokens(), m.ContextLength))
+			modelLines = append(modelLines, fmt.Sprintf("• %s — %s, %d context", modelLine(m.Name, m.ID), c.formatCost(m.CostPer1MTokens()), m.ContextLength))
 		}
 		if len(changeset.UpdatedModels) > maxDisplay {
 			modelLines = append(modelLines, fmt.Sprintf("... y %d modelos mas", len(changeset.UpdatedModels)-maxDisplay))
@@ -346,7 +349,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 		for i := 0; i < displayCount; i++ {
 			m := changeset.RemovedModels[i]
-			modelLines = append(modelLines, fmt.Sprintf("• %s — $%.4f/1M tokens, %d context", escapeName(m.Name), m.CostPer1MTokens(), m.ContextLength))
+			modelLines = append(modelLines, fmt.Sprintf("• %s — %s, %d context", escapeName(m.Name), c.formatCost(m.CostPer1MTokens()), m.ContextLength))
 		}
 		if len(changeset.RemovedModels) > maxDisplay {
 			modelLines = append(modelLines, fmt.Sprintf("... y %d modelos mas", len(changeset.RemovedModels)-maxDisplay))
@@ -379,6 +382,12 @@ type RateLimitError struct {
 
 func (e *RateLimitError) Error() string {
 	return fmt.Sprintf("rate limited, retry after: %s", e.RetryAfter)
+}
+
+// formatCost converts a USD-per-1M-tokens cost to PEN with clean formatting
+func (c *WebhookClient) formatCost(usdPer1M float64) string {
+	penPer1M := usdPer1M * c.usdToPENRate
+	return fmt.Sprintf("S/%.2f", penPer1M)
 }
 
 // escapeName escapes markdown special chars in model names for safe Discord links

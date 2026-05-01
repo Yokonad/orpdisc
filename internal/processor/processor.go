@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/Yokonad/orpdisc/internal/database"
 	"github.com/Yokonad/orpdisc/internal/models"
@@ -179,8 +180,16 @@ func GetModelDetails(model *models.Model) string {
 
 // TopByContextLength returns the top N models sorted by largest context length
 func TopByContextLength(modelList []models.Model, n int) []models.Model {
-	sorted := make([]models.Model, len(modelList))
-	copy(sorted, modelList)
+	// Filter out negative/zero context
+	filtered := make([]models.Model, 0, len(modelList))
+	for _, m := range modelList {
+		if m.ContextLength > 0 {
+			filtered = append(filtered, m)
+		}
+	}
+
+	sorted := make([]models.Model, len(filtered))
+	copy(sorted, filtered)
 
 	sort.Slice(sorted, func(i, j int) bool {
 		return sorted[i].ContextLength > sorted[j].ContextLength
@@ -194,8 +203,17 @@ func TopByContextLength(modelList []models.Model, n int) []models.Model {
 
 // TopByNewest returns the top N models sorted by newest first_seen
 func TopByNewest(modelList []models.Model, n int) []models.Model {
-	sorted := make([]models.Model, len(modelList))
-	copy(sorted, modelList)
+	// Filter out models with zero first_seen
+	filtered := make([]models.Model, 0, len(modelList))
+	zeroTime := time.Time{}
+	for _, m := range modelList {
+		if !m.FirstSeen.Equal(zeroTime) {
+			filtered = append(filtered, m)
+		}
+	}
+
+	sorted := make([]models.Model, len(filtered))
+	copy(sorted, filtered)
 
 	sort.Slice(sorted, func(i, j int) bool {
 		return sorted[i].FirstSeen.After(sorted[j].FirstSeen)
@@ -209,8 +227,17 @@ func TopByNewest(modelList []models.Model, n int) []models.Model {
 
 // TopByCostPer1K returns the top N models sorted by lowest cost per 1K tokens
 func TopByCostPer1K(modelList []models.Model, n int) []models.Model {
-	sorted := make([]models.Model, len(modelList))
-	copy(sorted, modelList)
+	// Filter out free and negative-priced models
+	filtered := make([]models.Model, 0, len(modelList))
+	for _, m := range modelList {
+		cost := CalculateCostPer1KTokens(m.PricingPrompt, m.PricingCompletion)
+		if cost > 0 {
+			filtered = append(filtered, m)
+		}
+	}
+
+	sorted := make([]models.Model, len(filtered))
+	copy(sorted, filtered)
 
 	sort.Slice(sorted, func(i, j int) bool {
 		costI := CalculateCostPer1KTokens(sorted[i].PricingPrompt, sorted[i].PricingCompletion)
@@ -226,8 +253,17 @@ func TopByCostPer1K(modelList []models.Model, n int) []models.Model {
 
 // TopByContextCostRatio returns the top N models sorted by highest context/cost ratio
 func TopByContextCostRatio(modelList []models.Model, n int) []models.Model {
-	sorted := make([]models.Model, len(modelList))
-	copy(sorted, modelList)
+	// Filter out free and negative-priced models
+	filtered := make([]models.Model, 0, len(modelList))
+	for _, m := range modelList {
+		cost := CalculateCostPer1KTokens(m.PricingPrompt, m.PricingCompletion)
+		if cost > 0 && m.ContextLength > 0 {
+			filtered = append(filtered, m)
+		}
+	}
+
+	sorted := make([]models.Model, len(filtered))
+	copy(sorted, filtered)
 
 	sort.Slice(sorted, func(i, j int) bool {
 		costI := CalculateCostPer1KTokens(sorted[i].PricingPrompt, sorted[i].PricingCompletion)

@@ -142,8 +142,8 @@ func (db *DB) GetAllModels() ([]models.Model, error) {
 func (db *DB) SaveModel(model *models.Model) error {
 	query := `
 		INSERT INTO models (id, name, provider, description, context_length, max_completion_tokens,
-							pricing_prompt, pricing_completion, tokenizer, data_hash, first_seen, last_updated)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+							pricing_prompt, pricing_completion, tokenizer, data_hash, last_updated)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(id) DO UPDATE SET
 			name = excluded.name,
 			provider = excluded.provider,
@@ -163,7 +163,7 @@ func (db *DB) SaveModel(model *models.Model) error {
 		model.ID, model.Name, model.Provider, model.Description,
 		model.ContextLength, model.MaxCompletionTokens,
 		model.PricingPrompt, model.PricingCompletion, model.Tokenizer,
-		model.DataHash, model.FirstSeen, model.LastUpdated,
+		model.DataHash, model.LastUpdated,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to save model: %w", err)

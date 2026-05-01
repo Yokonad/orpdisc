@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -211,8 +212,8 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		if len(changeset.NewModels) > 0 {
 			m := changeset.NewModels[0]
 			cost := m.CostPer1KTokens()
-			value := fmt.Sprintf("[%s](%s%s)\n$%.6f/1K tokens\n%d context\nRatio: %.2f",
-				m.Name, OpenRouterBaseURL, m.ID, cost, m.ContextLength, m.ContextCostRatio())
+			value := fmt.Sprintf("%s\n$%.6f/1K tokens\n%d context\nRatio: %.2f",
+				modelLine(m.Name, m.ID), cost, m.ContextLength, m.ContextCostRatio())
 			fields = append(fields, DiscordField{
 				Name:   "Mejor por Costo",
 				Value:  value,
@@ -223,8 +224,8 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		if len(changeset.UpdatedModels) > 0 {
 			m := changeset.UpdatedModels[0]
 			cost := m.CostPer1KTokens()
-			value := fmt.Sprintf("[%s](%s%s)\n$%.6f/1K tokens\n%d context\nRatio: %.2f",
-				m.Name, OpenRouterBaseURL, m.ID, cost, m.ContextLength, m.ContextCostRatio())
+			value := fmt.Sprintf("%s\n$%.6f/1K tokens\n%d context\nRatio: %.2f",
+				modelLine(m.Name, m.ID), cost, m.ContextLength, m.ContextCostRatio())
 			fields = append(fields, DiscordField{
 				Name:   "Mejor Relacion Contexto/Costo",
 				Value:  value,
@@ -235,8 +236,8 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		if len(changeset.RemovedModels) > 0 {
 			m := changeset.RemovedModels[0]
 			cost := m.CostPer1KTokens()
-			value := fmt.Sprintf("[%s](%s%s)\n$%.6f/1K tokens\n%d context\nMax salida: %d",
-				m.Name, OpenRouterBaseURL, m.ID, cost, m.ContextLength, m.MaxCompletionTokens)
+			value := fmt.Sprintf("%s\n$%.6f/1K tokens\n%d context\nMax salida: %d",
+				modelLine(m.Name, m.ID), cost, m.ContextLength, m.MaxCompletionTokens)
 			fields = append(fields, DiscordField{
 				Name:   "Mas Capaz (Mayor Contexto)",
 				Value:  value,
@@ -247,8 +248,8 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		if len(changeset.DigestNewest) > 0 {
 			m := changeset.DigestNewest[0]
 			cost := m.CostPer1KTokens()
-			value := fmt.Sprintf("[%s](%s%s)\n$%.6f/1K tokens\n%d context\nVisto: %s",
-				m.Name, OpenRouterBaseURL, m.ID, cost, m.ContextLength,
+			value := fmt.Sprintf("%s\n$%.6f/1K tokens\n%d context\nVisto: %s",
+				modelLine(m.Name, m.ID), cost, m.ContextLength,
 				m.FirstSeen.Format("02/01/2006"))
 			fields = append(fields, DiscordField{
 				Name:   "Modelo Mas Nuevo",
@@ -279,7 +280,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 		for i := 0; i < displayCount; i++ {
 			m := changeset.NewModels[i]
-			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
+			modelLines = append(modelLines, fmt.Sprintf("• %s — $%.6f/1K tokens, %d context", modelLine(m.Name, m.ID), m.CostPer1KTokens(), m.ContextLength))
 		}
 		if len(changeset.NewModels) > maxDisplay {
 			modelLines = append(modelLines, fmt.Sprintf("... y %d modelos mas", len(changeset.NewModels)-maxDisplay))
@@ -312,7 +313,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 		for i := 0; i < displayCount; i++ {
 			m := changeset.UpdatedModels[i]
-			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
+			modelLines = append(modelLines, fmt.Sprintf("• %s — $%.6f/1K tokens, %d context", modelLine(m.Name, m.ID), m.CostPer1KTokens(), m.ContextLength))
 		}
 		if len(changeset.UpdatedModels) > maxDisplay {
 			modelLines = append(modelLines, fmt.Sprintf("... y %d modelos mas", len(changeset.UpdatedModels)-maxDisplay))
@@ -345,7 +346,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 		}
 		for i := 0; i < displayCount; i++ {
 			m := changeset.RemovedModels[i]
-			modelLines = append(modelLines, fmt.Sprintf("• %s — $%.6f/1K tokens, %d context", m.Name, m.CostPer1KTokens(), m.ContextLength))
+			modelLines = append(modelLines, fmt.Sprintf("• %s — $%.6f/1K tokens, %d context", escapeName(m.Name), m.CostPer1KTokens(), m.ContextLength))
 		}
 		if len(changeset.RemovedModels) > maxDisplay {
 			modelLines = append(modelLines, fmt.Sprintf("... y %d modelos mas", len(changeset.RemovedModels)-maxDisplay))
@@ -378,6 +379,22 @@ type RateLimitError struct {
 
 func (e *RateLimitError) Error() string {
 	return fmt.Sprintf("rate limited, retry after: %s", e.RetryAfter)
+}
+
+// escapeName escapes markdown special chars in model names for safe Discord links
+func escapeName(name string) string {
+	name = strings.ReplaceAll(name, "\\", "\\\\")
+	name = strings.ReplaceAll(name, "[", "\\[")
+	name = strings.ReplaceAll(name, "]", "\\]")
+	name = strings.ReplaceAll(name, "(", "\\(")
+	name = strings.ReplaceAll(name, ")", "\\)")
+	return name
+}
+
+// modelLine formats a model name as a safe Discord markdown link
+func modelLine(name, id string) string {
+	url := OpenRouterBaseURL + id
+	return fmt.Sprintf("[%s](%s)", escapeName(name), url)
 }
 
 // joinLines joins strings with newlines, limiting to avoid Discord embed limits

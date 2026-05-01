@@ -208,10 +208,12 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 	if changeset.IsDigest {
 		var lines []string
 		if len(changeset.NewModels) > 0 {
-			lines = append(lines, fmt.Sprintf("Best by Cost: [%s](%s%s)", changeset.NewModels[0].Name, OpenRouterBaseURL, changeset.NewModels[0].ID))
+			m := changeset.NewModels[0]
+			lines = append(lines, fmt.Sprintf("Best by Cost: [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
 		}
 		if len(changeset.UpdatedModels) > 0 {
-			lines = append(lines, fmt.Sprintf("Best by Context/Cost: [%s](%s%s)", changeset.UpdatedModels[0].Name, OpenRouterBaseURL, changeset.UpdatedModels[0].ID))
+			m := changeset.UpdatedModels[0]
+			lines = append(lines, fmt.Sprintf("Best by Context/Cost: [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
 		}
 
 		embed := DiscordEmbed{
@@ -236,7 +238,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 	if len(changeset.NewModels) > 0 {
 		var modelLines []string
 		for _, m := range changeset.NewModels {
-			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s)", m.Name, OpenRouterBaseURL, m.ID))
+			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
 		}
 
 		embed := DiscordEmbed{
@@ -260,7 +262,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 	if len(changeset.UpdatedModels) > 0 {
 		var modelLines []string
 		for _, m := range changeset.UpdatedModels {
-			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s)", m.Name, OpenRouterBaseURL, m.ID))
+			modelLines = append(modelLines, fmt.Sprintf("• [%s](%s%s) — $%.6f/1K tokens, %d context", m.Name, OpenRouterBaseURL, m.ID, m.CostPer1KTokens(), m.ContextLength))
 		}
 
 		embed := DiscordEmbed{
@@ -284,7 +286,7 @@ func (c *WebhookClient) BuildEmbedsForChangeset(changeset *models.Changeset) []D
 	if len(changeset.RemovedModels) > 0 {
 		var modelLines []string
 		for _, m := range changeset.RemovedModels {
-			modelLines = append(modelLines, fmt.Sprintf("• %s", m.Name))
+			modelLines = append(modelLines, fmt.Sprintf("• %s — $%.6f/1K tokens, %d context", m.Name, m.CostPer1KTokens(), m.ContextLength))
 		}
 
 		embed := DiscordEmbed{

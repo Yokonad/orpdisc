@@ -6,32 +6,26 @@
 </a>
 
 <br />
-
-<!-- ===== SUBTITLE ===== -->
-<img src="https://img.shields.io/badge/Automated%20AI%20Model%20Monitor-FF00FF?style=for-the-badge&logo=openai&logoColor=white&labelColor=0D1117&color=FF00FF" alt="Automated AI Model Monitor" />
-
-<br />
-
-<!-- ===== TECH STACK BADGES ===== -->
-<a href="https://go.dev"><img src="https://img.shields.io/badge/Go-1.26-00ADD8?style=for-the-badge&logo=go&logoColor=white&labelColor=0D1117&color=00ADD8" /></a>
-<a href="https://www.sqlite.org/"><img src="https://img.shields.io/badge/SQLite-3-003B57?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=0D1117&color=003B57" /></a>
-<a href="https://discord.com/developers/docs/resources/webhook"><img src="https://img.shields.io/badge/Discord%20Webhook-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=0D1117&color=5865F2" /></a>
-<a href="https://openrouter.ai/"><img src="https://img.shields.io/badge/OpenRouter%20API-FF6B35?style=for-the-badge&logo=openai&logoColor=white&labelColor=0D1117&color=FF6B35" /></a>
-<a href="https://systemd.io/"><img src="https://img.shields.io/badge/systemd-FFDD00?style=for-the-badge&logo=systemd&logoColor=black&labelColor=0D1117&color=FFDD00" /></a>
-<a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white&labelColor=0D1117&color=2496ED" /></a>
-
 <br />
 
 <!-- ===== ANIMATED GIF ===== -->
-<img src="https://media4.giphy.com/media/L1R1tvI9kwzkP8TgIr/giphy.gif" alt="Anime Coding" width="720" style="border-radius: 12px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);" />
+<img src="https://media4.giphy.com/media/L1R1tvI9kwzkP8TgIr/giphy.gif" alt="Anime Tech Coding" width="720" style="border-radius: 12px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);" />
 
 <br />
 <br />
 
-<!-- ===== QUICK STATUS BADGES ===== -->
-<a href="https://github.com/Yokonad/orpdisc/actions"><img src="https://img.shields.io/badge/build-passing-00E676?style=for-the-badge&logo=githubactions&logoColor=white&labelColor=0D1117&color=00E676" /></a>
-<a href="https://github.com/Yokonad/orpdisc/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-FFD700?style=for-the-badge&logo=openaccess&logoColor=white&labelColor=0D1117&color=FFD700" /></a>
-<a href="https://go.dev"><img src="https://img.shields.io/badge/go%20report-A+-00E676?style=for-the-badge&logo=go&logoColor=white&labelColor=0D1117&color=00E676" /></a>
+<!-- ===== TECH STACK BADGES ===== -->
+<img src="https://img.shields.io/badge/Cybersecurity%20Engineering-FF0000?style=for-the-badge&logo=security&logoColor=white&labelColor=0D1117&color=FF0000" />
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white&labelColor=0D1117&color=3178C6" />
+<img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black&labelColor=0D1117&color=61DAFB" />
+<img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white&labelColor=0D1117&color=FF2D20" />
+<img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white&labelColor=0D1117&color=00ADD8" />
+<img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=0D1117&color=003B57" />
+<img src="https://img.shields.io/badge/Discord%20Webhook-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=0D1117&color=5865F2" />
+<img src="https://img.shields.io/badge/OpenRouter%20API-FF6B35?style=for-the-badge&logo=openai&logoColor=white&labelColor=0D1117&color=FF6B35" />
+<img src="https://img.shields.io/badge/systemd-FFDD00?style=for-the-badge&logo=systemd&logoColor=black&labelColor=0D1117&color=FFDD00" />
+<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white&labelColor=0D1117&color=2496ED" />
+<img src="https://img.shields.io/badge/build-passing-00E676?style=for-the-badge&logo=githubactions&logoColor=white&labelColor=0D1117&color=00E676" />
 
 </div>
 
@@ -45,7 +39,7 @@
   <img src="https://img.shields.io/badge/DESCRIPCION-FF00FF?style=for-the-badge&labelColor=0D1117&color=FF00FF" />
 </div>
 
-<b>orpdisc</b> es un servicio automatizado en <b>Go</b> que consulta la API de <b>OpenRouter</b>, detecta cambios en modelos de IA (nuevos, actualizados, eliminados) y envía notificaciones enriquecidas a <b>Discord</b> con precios exactos, ranking de calidad y horario inteligente.
+<b>orpdisc</b> es un servicio automatizado en <b>Go</b> que consulta la API de <b>OpenRouter</b>, detecta cambios en modelos de IA (nuevos, actualizados, eliminados) y envia notificaciones enriquecidas a <b>Discord</b> con precios exactos, ranking de calidad y horario inteligente.
 
 <br />
 
@@ -299,48 +293,38 @@ curl http://localhost:9090/health
 <br />
 
 <!-- ================================================================================== -->
-<!-- SECTION: ARCHITECTURE                                                               -->
+<!-- SECTION: ORGANIZACION DEL PROYECTO                                                  -->
 <!-- ================================================================================== -->
 
 <div align="left">
-  <img src="https://img.shields.io/badge/ARQUITECTURA-00E5FF?style=for-the-badge&labelColor=0D1117&color=00E5FF" />
+  <img src="https://img.shields.io/badge/ORGANIZACION%20DEL%20PROYECTO-00E5FF?style=for-the-badge&labelColor=0D1117&color=00E5FF" />
 </div>
 
 <br />
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    cmd/monitor/main.go                    │
-│                     Punto de entrada                       │
-└────────────┬────────────────────────────────┬────────────┘
-             │                                │
-    ┌────────▼────────┐            ┌─────────▼─────────┐
-    │  internal/service │            │  internal/config   │
-    │   Orquestrador    │            │  Variables de      │
-    │  ┌─────────────┐ │            │  entorno (env)     │
-    │  │ Start()     │ │            └───────────────────┘
-    │  │  ├─ poll()  │ │
-    │  │  └─ maybe   │ │
-    │  │     Send    │ │
-    │  │     Digest()│ │
-    │  └─────────────┘ │
-    └────────┬─────────┘
-             │
-    ┌────────▼─────────┐   ┌──────────────────┐   ┌──────────────────┐
-    │ internal/openrouter│   │ internal/processor │   │ internal/discord   │
-    │  FetchModels()    │──▶│  ProcessModels()  │──▶│  SendNotification()│
-    │  Circuit Breaker  │   │  TopByCost()      │   │  BuildEmbeds()     │
-    │  Exponential      │   │  TopByContext()   │   │  Rate Limit Retry  │
-    │  Backoff Retry    │   │  TopByNewest()    │   │  Color Coding      │
-    └───────────────────┘   └────────┬──────────┘   └──────────────────┘
-                                     │
-                            ┌────────▼──────────┐
-                            │ internal/database   │
-                            │  SQLite (modernc)   │
-                            │  CGO-free           │
-                            │  Models, Price      │
-                            │  History, Notifs    │
-                            └───────────────────┘
+cmd/
+  monitor/
+    main.go                # Punto de entrada del servicio
+
+internal/
+  config/
+    config.go              # Configuracion por variables de entorno
+  database/
+    db.go                  # Capa de persistencia SQLite (modernc, CGO-free)
+  discord/
+    webhook.go             # Cliente de webhook Discord con retry
+  models/
+    types.go               # Tipos de datos: Model, Changeset, API response
+  openrouter/
+    client.go              # Cliente HTTP para OpenRouter API con circuit breaker
+  processor/
+    processor.go           # Deteccion de cambios y rankings de modelos
+  service/
+    service.go             # Orquestrador: polling, digest, health check
+
+openrouter-monitor.service   # Unidad systemd para produccion
+Dockerfile                   # Imagen Docker multi-stage
 ```
 
 <br />
@@ -365,10 +349,6 @@ Distribuido bajo licencia **MIT**. Consulta el archivo <a href="https://github.c
 
 <div align="center">
   <hr style="border: 1px solid #00E5FF; width: 80%; opacity: 0.3;" />
-
-  <br />
-
-  <img src="https://img.shields.io/badge/Made%20with%20Go%20in%20Peru-0D1117?style=for-the-badge&logo=go&logoColor=00E5FF&labelColor=0D1117&color=0D1117" />
 
   <br />
 

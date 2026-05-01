@@ -41,13 +41,11 @@
 <!-- SECTION: DESCRIPTION                                                               -->
 <!-- ================================================================================== -->
 
-<div align="center">
-  <img src="https://img.shields.io/badge/%F0%9F%93%96%20DESCRIPCION-FF00FF?style=for-the-badge&labelColor=0D1117&color=FF00FF" />
+<div align="left">
+  <img src="https://img.shields.io/badge/DESCRIPCION-FF00FF?style=for-the-badge&labelColor=0D1117&color=FF00FF" />
 </div>
 
-<p align="center">
-  <b>orpdisc</b> es un servicio automatizado en <b>Go</b> que consulta la API de <b>OpenRouter</b>, detecta cambios en modelos de IA (nuevos, actualizados, eliminados) y envía notificaciones enriquecidas a <b>Discord</b> con precios exactos, ranking de calidad y horario inteligente.
-</p>
+<b>orpdisc</b> es un servicio automatizado en <b>Go</b> que consulta la API de <b>OpenRouter</b>, detecta cambios en modelos de IA (nuevos, actualizados, eliminados) y envía notificaciones enriquecidas a <b>Discord</b> con precios exactos, ranking de calidad y horario inteligente.
 
 <br />
 
@@ -55,22 +53,22 @@
 <!-- SECTION: FEATURES                                                                   -->
 <!-- ================================================================================== -->
 
-<div align="center">
-  <img src="https://img.shields.io/badge/%E2%9A%A1%20CARACTERISTICAS-00E5FF?style=for-the-badge&labelColor=0D1117&color=00E5FF" />
+<div align="left">
+  <img src="https://img.shields.io/badge/CARACTERISTICAS-00E5FF?style=for-the-badge&labelColor=0D1117&color=00E5FF" />
 </div>
 
 <br />
 
-| Característica | Descripción |
+| Caracteristica | Descripcion |
 |:--|:--|
-| 🤖 **Monitor Automatizado** | Consulta la API de OpenRouter cada `30 min` y detecta cambios |
-| 🧠 **Ranking Inteligente** | Top modelos por: costo, relación contexto/costo, capacidad y novedad |
-| ⏰ **Horario Activo** | Notificaciones solo entre **9:00 - 19:00** (hora Peru) |
-| 🛡️ **Circuit Breaker** | Previene saturación de API con tolerancia a fallos configurable |
-| 💚 **Health Check** | Endpoint HTTP `:9090/health` para monitoreo |
-| 🗄️ **SQLite** | Almacenamiento local sin dependencias externas |
-| ♻️ **Auto-Restart** | Systemd reinicia el servicio automáticamente si falla |
-| 🐳 **Docker** | Despliegue en contenedor listo para producción |
+| Monitor Automatico | Consulta la API de OpenRouter cada `30 min` y detecta cambios |
+| Ranking Inteligente | Top modelos por: costo, relacion contexto/costo, capacidad y novedad |
+| Horario Activo | Notificaciones solo entre **9:00 - 19:00** (hora Peru) |
+| Circuit Breaker | Previene saturacion de API con tolerancia a fallos configurable |
+| Health Check | Endpoint HTTP `:9090/health` para monitoreo |
+| SQLite | Almacenamiento local sin dependencias externas |
+| Auto-Restart | Systemd reinicia el servicio automaticamente si falla |
+| Docker | Despliegue en contenedor listo para produccion |
 
 <br />
 
@@ -78,19 +76,17 @@
 <!-- SECTION: NOTIFICATIONS PREVIEW                                                      -->
 <!-- ================================================================================== -->
 
-<div align="center">
-  <img src="https://img.shields.io/badge/%F0%9F%93%AC%20VISTA%20PREVIA%20DE%20NOTIFICACIONES-FF6B35?style=for-the-badge&labelColor=0D1117&color=FF6B35" />
+<div align="left">
+  <img src="https://img.shields.io/badge/VISTA%20PREVIA%20DE%20NOTIFICACIONES-FF6B35?style=for-the-badge&labelColor=0D1117&color=FF6B35" />
 </div>
 
 <br />
 
-Cada 30 min (9am-7pm Peru) recibirás un resumen como este en Discord:
-
-<div align="center">
+Cada 30 min (9am-7pm Peru) recibiras un resumen como este en Discord:
 
 ```
 ╔══════════════════════════════════════════════════════════╗
-║              RESÚMEN DE MODELOS                          ║
+║              RESUMEN DE MODELOS                          ║
 ║           Mejores modelos del momento                    ║
 ╠══════════════════╦═══════════════════════╦═══════════════╣
 ║ Mejor por Costo  ║ Mejor Relacion        ║ Mas Capaz     ║
@@ -99,11 +95,9 @@ Cada 30 min (9am-7pm Peru) recibirás un resumen como este en Discord:
 ║ 1M context       ║ $0.015/1K tokens      ║ $0.005/1K     ║
 ║ Ratio: 200       ║ 200K context          ║ 1M context    ║
 ╠══════════════════╩═══════════════════════╩═══════════════╣
-║  🆕 Modelo Mas Nuevo: [GPT-5] — visto 01/05/2026        ║
+║  Modelo Mas Nuevo: [GPT-5] - visto 01/05/2026           ║
 ╚══════════════════════════════════════════════════════════╝
 ```
-
-</div>
 
 <br />
 
@@ -111,23 +105,23 @@ Cada 30 min (9am-7pm Peru) recibirás un resumen como este en Discord:
 <!-- SECTION: INSTALLATION                                                               -->
 <!-- ================================================================================== -->
 
-<div align="center">
-  <img src="https://img.shields.io/badge/%F0%9F%9B%A0%20INSTALACION-00E676?style=for-the-badge&labelColor=0D1117&color=00E676" />
+<div align="left">
+  <img src="https://img.shields.io/badge/INSTALACION-00E676?style=for-the-badge&labelColor=0D1117&color=00E676" />
 </div>
 
 <br />
 
-### 📋 Requisitos Previos
+### Requisitos Previos
 
-| Requisito | Versión Mínima |
+| Requisito | Version Minima |
 |:--|:--:|
 | [Go](https://go.dev/dl/) | `1.21+` |
 | [SQLite](https://www.sqlite.org/download.html) | `3.x` |
-| [Discord Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) | URL válida |
+| [Discord Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) | URL valida |
 
 <br />
 
-### 🐚 Desde Código Fuente
+### Desde Codigo Fuente
 
 ```bash
 # Clonar repositorio
@@ -152,7 +146,7 @@ EOF
 
 <br />
 
-### 🐳 Desde Docker
+### Desde Docker
 
 ```bash
 # Construir imagen
@@ -172,7 +166,7 @@ docker run -d \
 
 <br />
 
-### ⚙️ Desde systemd (Recomendado para VPS)
+### Desde systemd (Recomendado para VPS)
 
 ```bash
 # 1. Copiar archivo de servicio
@@ -196,15 +190,15 @@ sudo systemctl status openrouter-monitor
 <!-- SECTION: CONFIGURATION                                                              -->
 <!-- ================================================================================== -->
 
-<div align="center">
-  <img src="https://img.shields.io/badge/%E2%9A%99%20CONFIGURACION-FFD700?style=for-the-badge&labelColor=0D1117&color=FFD700" />
+<div align="left">
+  <img src="https://img.shields.io/badge/CONFIGURACION-FFD700?style=for-the-badge&labelColor=0D1117&color=FFD700" />
 </div>
 
 <br />
 
 Todas las opciones se configuran mediante **variables de entorno** en `/etc/openrouter-monitor.env`:
 
-| Variable | Default | Descripción |
+| Variable | Default | Descripcion |
 |:--|:--:|:--|
 | `DISCORD_WEBHOOK_URL` | **requerido** | URL del webhook de Discord |
 | `POLL_INTERVAL_MINUTES` | `30m` | Intervalo entre consultas a OpenRouter |
@@ -212,7 +206,7 @@ Todas las opciones se configuran mediante **variables de entorno** en `/etc/open
 | `LOG_LEVEL` | `info` | Nivel de log: `debug`, `info`, `warn`, `error` |
 | `HTTP_TIMEOUT_SECONDS` | `30s` | Timeout para requests HTTP |
 | `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` | URL base de la API |
-| `MAX_RETRIES` | `5` | Intentos máximos antes de fallar |
+| `MAX_RETRIES` | `5` | Intentos maximos antes de fallar |
 | `CIRCUIT_BREAKER_THRESHOLD` | `5` | Fallos consecutivos para abrir circuito |
 | `CIRCUIT_BREAKER_TIMEOUT_MINUTES` | `60m` | Tiempo de espera del circuit breaker |
 | `HEALTH_CHECK_PORT` | `:9090` | Puerto del health check HTTP |
@@ -243,13 +237,13 @@ ACTIVE_END_HOUR=19
 <!-- SECTION: USAGE                                                                      -->
 <!-- ================================================================================== -->
 
-<div align="center">
-  <img src="https://img.shields.io/badge/%F0%9F%9A%80%20USO-FF00FF?style=for-the-badge&labelColor=0D1117&color=FF00FF" />
+<div align="left">
+  <img src="https://img.shields.io/badge/USO-FF00FF?style=for-the-badge&labelColor=0D1117&color=FF00FF" />
 </div>
 
 <br />
 
-### ▶️ Comandos Básicos
+### Comandos Basicos
 
 ```bash
 # Iniciar servicio
@@ -270,15 +264,15 @@ sudo systemctl restart openrouter-monitor
 
 <br />
 
-### 🩺 Health Check
+### Health Check
 
 ```bash
 # Verificar que el servicio responde
 curl http://localhost:9090/health
 
 # Respuesta esperada:
-#   200 → "saludable"      (todo bien)
-#   503 → "no saludable"   (base de datos caída)
+#   200 - "saludable"      (todo bien)
+#   503 - "no saludable"   (base de datos caida)
 ```
 
 <br />
@@ -287,20 +281,20 @@ curl http://localhost:9090/health
 <!-- SECTION: TROUBLESHOOTING                                                            -->
 <!-- ================================================================================== -->
 
-<div align="center">
-  <img src="https://img.shields.io/badge/%F0%9F%94%A7%20SOLUCION%20DE%20PROBLEMAS-FF4444?style=for-the-badge&labelColor=0D1117&color=FF4444" />
+<div align="left">
+  <img src="https://img.shields.io/badge/SOLUCION%20DE%20PROBLEMAS-FF4444?style=for-the-badge&labelColor=0D1117&color=FF4444" />
 </div>
 
 <br />
 
-| Problema | Solución |
+| Problema | Solucion |
 |:--|:--|
-| ❌ El servicio no inicia | Verificar `DISCORD_WEBHOOK_URL`, permisos de DB y logs con `journalctl -u openrouter-monitor -n 50` |
-| 🔇 No llegan notificaciones | Verificar webhook URL, canal de Discord, y horario activo (9:00-19:00 Peru) |
-| 🔒 Circuit breaker abierto | Revisar estado de OpenRouter API, aumentar `CIRCUIT_BREAKER_TIMEOUT_MINUTES` |
-| 🗄️ Base de datos bloqueada | Solo una instancia a la vez, verificar espacio en disco |
-| 🚫 Health check 503 | `sqlite3 /path/data.db "SELECT 1;"` — verificar permisos y disco |
-| ⏰ Notificaciones fuera de horario | Ajustar `ACTIVE_START_HOUR` y `ACTIVE_END_HOUR` en el archivo de entorno |
+| El servicio no inicia | Verificar `DISCORD_WEBHOOK_URL`, permisos de DB y logs con `journalctl -u openrouter-monitor -n 50` |
+| No llegan notificaciones | Verificar webhook URL, canal de Discord, y horario activo (9:00-19:00 Peru) |
+| Circuit breaker abierto | Revisar estado de OpenRouter API, aumentar `CIRCUIT_BREAKER_TIMEOUT_MINUTES` |
+| Base de datos bloqueada | Solo una instancia a la vez, verificar espacio en disco |
+| Health check 503 | `sqlite3 /path/data.db "SELECT 1;"` -- verificar permisos y disco |
+| Notificaciones fuera de horario | Ajustar `ACTIVE_START_HOUR` y `ACTIVE_END_HOUR` en el archivo de entorno |
 
 <br />
 
@@ -308,8 +302,8 @@ curl http://localhost:9090/health
 <!-- SECTION: ARCHITECTURE                                                               -->
 <!-- ================================================================================== -->
 
-<div align="center">
-  <img src="https://img.shields.io/badge/%F0%9F%8F%97%20ARQUITECTURA-00E5FF?style=for-the-badge&labelColor=0D1117&color=00E5FF" />
+<div align="left">
+  <img src="https://img.shields.io/badge/ARQUITECTURA-00E5FF?style=for-the-badge&labelColor=0D1117&color=00E5FF" />
 </div>
 
 <br />
@@ -355,15 +349,13 @@ curl http://localhost:9090/health
 <!-- SECTION: LICENSE                                                                    -->
 <!-- ================================================================================== -->
 
-<div align="center">
-  <img src="https://img.shields.io/badge/%F0%9F%93%84%20LICENCIA-00E676?style=for-the-badge&labelColor=0D1117&color=00E676" />
+<div align="left">
+  <img src="https://img.shields.io/badge/LICENCIA-00E676?style=for-the-badge&labelColor=0D1117&color=00E676" />
 </div>
 
 <br />
 
-<p align="center">
-  Distribuido bajo licencia <b>MIT</b>. Consulta el archivo <a href="https://github.com/Yokonad/orpdisc/blob/main/LICENSE"><code>LICENSE</code></a> para más detalles.
-</p>
+Distribuido bajo licencia **MIT**. Consulta el archivo <a href="https://github.com/Yokonad/orpdisc/blob/main/LICENSE"><code>LICENSE</code></a> para mas detalles.
 
 <br />
 
@@ -376,7 +368,7 @@ curl http://localhost:9090/health
 
   <br />
 
-  <img src="https://img.shields.io/badge/Made%20with%20%E2%9D%A4%EF%B8%8F%20in%20Peru-0D1117?style=for-the-badge&logo=go&logoColor=00E5FF&labelColor=0D1117&color=0D1117" />
+  <img src="https://img.shields.io/badge/Made%20with%20Go%20in%20Peru-0D1117?style=for-the-badge&logo=go&logoColor=00E5FF&labelColor=0D1117&color=0D1117" />
 
   <br />
 
